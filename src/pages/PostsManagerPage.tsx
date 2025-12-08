@@ -1,40 +1,15 @@
 import { useEffect, useState, useCallback } from "react"
 import { Plus } from "lucide-react"
 import { useLocation, useNavigate } from "react-router-dom"
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../shared/ui"
+import { Button, Card, CardContent, CardHeader, CardTitle } from "../shared/ui"
 import { PostWithAuthor } from "../entity/post"
 import { Comment } from "../entity/comment"
-import { PostTableRow } from "../entity/post/ui"
-import {
-  PostCreateForm,
-  PostEditForm,
-  usePostDelete,
-  usePostList,
-  PostSearchInput,
-  PostFilter,
-  usePostFilter,
-  PostDetailDialog,
-  usePostDetail,
-} from "../features/post"
+import { PostCreateForm, PostEditForm, usePostDelete, PostDetailDialog, usePostDetail } from "../features/post"
 import { CommentCreateForm, CommentEditForm, useCommentManagement } from "../features/comment"
 import { UserViewModal, useUserView } from "../features/user-view"
 import { deleteComment } from "../entity/comment"
+import { fetchUser } from "../entity/user"
+import { PostListWithFilters } from "../widgets/PostListWithFilters"
 
 const PostsManager = () => {
   const navigate = useNavigate()
@@ -50,12 +25,10 @@ const PostsManager = () => {
   const [sortOrder, setSortOrder] = useState(queryParams.get("sortOrder") || "asc")
 
   // Features hooks
-  const { posts, setPosts, total, setTotal, loading, reload } = usePostList({ limit, skip })
   const { handleDeletePost } = usePostDelete()
   const { handleLikeComment } = useCommentManagement()
   const { selectedPost, comments, openPostDetail, loadComments } = usePostDetail()
   const { selectedUser, openUserModal } = useUserView()
-  const { handleFilterByTag } = usePostFilter()
 
   // 다이얼로그 상태
   const [showAddDialog, setShowAddDialog] = useState(false)
@@ -80,9 +53,7 @@ const PostsManager = () => {
 
   // 게시물 삭제 핸들러
   const handleDelete = async (id: number) => {
-    await handleDeletePost(id, () => {
-      setPosts(posts.filter((post) => post.id !== id))
-    })
+    await handleDeletePost(id)
   }
 
   // 게시물 상세 보기 핸들러
@@ -111,25 +82,10 @@ const PostsManager = () => {
     })
   }
 
-  // 검색 핸들러
-  const handleSearch = (searchedPosts: PostWithAuthor[], searchedTotal: number) => {
-    setPosts(searchedPosts)
-    setTotal(searchedTotal)
-  }
-
   // 태그 필터 핸들러
-  const handleTagFilter = (tag: string) => {
-    handleFilterByTag(tag, (filteredPosts, filteredTotal) => {
-      setPosts(filteredPosts)
-      setTotal(filteredTotal)
-    })
+  const handleTagFilter = () => {
     updateURL()
   }
-
-  // 초기 로드 및 limit/skip 변경 시 게시물 로드
-  useEffect(() => {
-    reload()
-  }, [limit, skip, reload])
 
   useEffect(() => {
     updateURL()
@@ -173,41 +129,6 @@ const PostsManager = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search])
 
-  // 게시물 테이블 렌더링
-  const renderPostTable = () => (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[50px]">ID</TableHead>
-          <TableHead>제목</TableHead>
-          <TableHead className="w-[150px]">작성자</TableHead>
-          <TableHead className="w-[150px]">반응</TableHead>
-          <TableHead className="w-[150px]">작업</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {posts.map((post) => (
-          <PostTableRow
-            key={post.id}
-            post={post}
-            searchQuery={searchQuery}
-            selectedTag={selectedTag}
-            onTagClick={(tag) => {
-              handleTagFilter(tag)
-            }}
-            onViewDetail={() => handleOpenPostDetail(post)}
-            onEdit={() => {
-              setSelectedPostForEdit(post)
-              setShowEditDialog(true)
-            }}
-            onDelete={() => handleDelete(post.id)}
-            onUserClick={() => openUserModal(post.author!).then(() => setShowUserModal(true))}
-          />
-        ))}
-      </TableBody>
-    </Table>
-  )
-
   return (
     <Card className="w-full max-w-6xl mx-auto">
       <CardHeader>
@@ -220,49 +141,35 @@ const PostsManager = () => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col gap-4">
-          {/* 검색 및 필터 컨트롤 */}
-          <div className="flex gap-4">
-            <PostSearchInput searchQuery={searchQuery} onSearchQueryChange={setSearchQuery} onSearch={handleSearch} />
-            <PostFilter
-              selectedTag={selectedTag}
-              sortBy={sortBy}
-              sortOrder={sortOrder}
-              onTagChange={handleTagFilter}
-              onSortByChange={setSortBy}
-              onSortOrderChange={setSortOrder}
-            />
-          </div>
-
-          {/* 게시물 테이블 */}
-          {loading ? <div className="flex justify-center p-4">로딩 중...</div> : renderPostTable()}
-
-          {/* 페이지네이션 */}
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <span>표시</span>
-              <Select value={limit.toString()} onValueChange={(value) => setLimit(Number(value))}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="10" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="20">20</SelectItem>
-                  <SelectItem value="30">30</SelectItem>
-                </SelectContent>
-              </Select>
-              <span>항목</span>
-            </div>
-            <div className="flex gap-2">
-              <Button disabled={skip === 0} onClick={() => setSkip(Math.max(0, skip - limit))}>
-                이전
-              </Button>
-              <Button disabled={skip + limit >= total} onClick={() => setSkip(skip + limit)}>
-                다음
-              </Button>
-            </div>
-          </div>
-        </div>
+        <PostListWithFilters
+          limit={limit}
+          skip={skip}
+          searchQuery={searchQuery}
+          selectedTag={selectedTag}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onLimitChange={setLimit}
+          onSkipChange={setSkip}
+          onSearchQueryChange={setSearchQuery}
+          onTagChange={handleTagFilter}
+          onSortByChange={setSortBy}
+          onSortOrderChange={setSortOrder}
+          onViewDetail={handleOpenPostDetail}
+          onEdit={(post) => {
+            setSelectedPostForEdit(post)
+            setShowEditDialog(true)
+          }}
+          onDelete={handleDelete}
+          onUserClick={async (userId) => {
+            try {
+              const user = await fetchUser(userId)
+              await openUserModal(user)
+              setShowUserModal(true)
+            } catch (error) {
+              console.error("사용자 정보 가져오기 오류:", error)
+            }
+          }}
+        />
       </CardContent>
 
       {/* Features 컴포넌트들 */}
@@ -270,7 +177,7 @@ const PostsManager = () => {
         open={showAddDialog}
         onOpenChange={setShowAddDialog}
         onSuccess={() => {
-          reload()
+          // 위젯이 자체적으로 reload를 관리함
         }}
       />
 
@@ -279,7 +186,7 @@ const PostsManager = () => {
         open={showEditDialog}
         onOpenChange={setShowEditDialog}
         onSuccess={() => {
-          reload()
+          // 위젯이 자체적으로 reload를 관리함
         }}
       />
 
