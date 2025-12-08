@@ -5,7 +5,7 @@ export const usePostDelete = () => {
     try {
       await deletePost(id)
       onSuccess?.()
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("게시물 삭제 오류:", error)
       throw error
     }
@@ -15,4 +15,3 @@ export const usePostDelete = () => {
     handleDeletePost,
   }
 }
-

@@ -1,8 +1,9 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../shared/ui"
 import { UserInfo } from "../../../entity/user/ui"
+import { User } from "../../../entity/user"
 
 interface UserViewModalProps {
-  user: any
+  user: User | null
   open: boolean
   onOpenChange: (open: boolean) => void
 }
@@ -21,4 +22,3 @@ export const UserViewModal = ({ user, open, onOpenChange }: UserViewModalProps) 
     </Dialog>
   )
 }
-

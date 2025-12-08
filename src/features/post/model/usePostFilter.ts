@@ -14,17 +14,14 @@ export const usePostFilter = () => {
       try {
         const data = await fetchTags()
         setTags(data)
-      } catch (error) {
+      } catch (error: unknown) {
         console.error("태그 가져오기 오류:", error)
       }
     }
     loadTags()
   }, [])
 
-  const handleFilterByTag = async (
-    tag: string,
-    onSuccess?: (posts: PostWithAuthor[], total: number) => void,
-  ) => {
+  const handleFilterByTag = async (tag: string, onSuccess?: (posts: PostWithAuthor[], total: number) => void) => {
     if (!tag || tag === "all") {
       setSelectedTag("")
       return
@@ -36,7 +33,7 @@ export const usePostFilter = () => {
       const { posts: fetchedPosts, total: fetchedTotal } = await fetchPostsByTag(tag)
       onSuccess?.(fetchedPosts, fetchedTotal)
       return { posts: fetchedPosts, total: fetchedTotal }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("태그별 게시물 가져오기 오류:", error)
       throw error
     } finally {
@@ -56,4 +53,3 @@ export const usePostFilter = () => {
     loading,
   }
 }
-

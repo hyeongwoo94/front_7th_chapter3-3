@@ -13,7 +13,7 @@ export const usePostEdit = () => {
       const data = await updatePost(selectedPost.id, selectedPost)
       onSuccess?.()
       return data
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("게시물 업데이트 오류:", error)
       throw error
     } finally {
@@ -28,4 +28,3 @@ export const usePostEdit = () => {
     loading,
   }
 }
-

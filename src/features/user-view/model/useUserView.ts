@@ -11,7 +11,7 @@ export const useUserView = () => {
       const userData = await fetchUser(user.id)
       setSelectedUser(userData)
       return userData
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("사용자 정보 가져오기 오류:", error)
       throw error
     } finally {
@@ -26,4 +26,3 @@ export const useUserView = () => {
     loading,
   }
 }
-

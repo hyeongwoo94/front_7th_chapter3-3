@@ -17,7 +17,7 @@ export const usePostList = ({ limit, skip }: UsePostListProps) => {
       const { posts: fetchedPosts, total: fetchedTotal } = await fetchPosts(limit, skip)
       setPosts(fetchedPosts)
       setTotal(fetchedTotal)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("게시물 가져오기 오류:", error)
     } finally {
       setLoading(false)
@@ -33,4 +33,3 @@ export const usePostList = ({ limit, skip }: UsePostListProps) => {
     reload: loadPosts,
   }
 }
-

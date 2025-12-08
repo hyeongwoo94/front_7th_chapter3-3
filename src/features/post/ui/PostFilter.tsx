@@ -26,9 +26,10 @@ export const PostFilter = ({
   return (
     <div className="flex gap-4">
       <Select
-        value={selectedTag}
+        value={selectedTag || "all"}
         onValueChange={(value) => {
-          onTagChange?.(value)
+          // "all"을 선택하면 빈 문자열로 변환
+          onTagChange?.(value === "all" ? "" : value)
         }}
       >
         <SelectTrigger className="w-[180px]">

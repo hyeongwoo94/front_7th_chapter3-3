@@ -1,19 +1,20 @@
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea } from "../../../shared/ui"
 import { usePostCreate } from "../model/usePostCreate"
+import { PostWithAuthor } from "../../../entity/post"
 
 interface PostCreateFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSuccess?: () => void
+  onSuccess?: (post: PostWithAuthor) => void
 }
 
 export const PostCreateForm = ({ open, onOpenChange, onSuccess }: PostCreateFormProps) => {
   const { newPost, setNewPost, handleAddPost, loading } = usePostCreate()
 
   const handleSubmit = async () => {
-    await handleAddPost(() => {
+    await handleAddPost((post: PostWithAuthor) => {
       onOpenChange(false)
-      onSuccess?.()
+      onSuccess?.(post)
     })
   }
 

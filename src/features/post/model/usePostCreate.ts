@@ -12,7 +12,7 @@ export const usePostCreate = () => {
       setNewPost({ title: "", body: "", userId: 1 })
       onSuccess?.(data as PostWithAuthor)
       return data
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("게시물 추가 오류:", error)
       throw error
     } finally {
@@ -27,4 +27,3 @@ export const usePostCreate = () => {
     loading,
   }
 }
-

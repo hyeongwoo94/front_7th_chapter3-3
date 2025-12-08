@@ -12,13 +12,19 @@ export const useCommentManagement = () => {
 
   // 댓글 생성
   const handleAddComment = async (onSuccess?: (comment: Comment) => void) => {
+    // postId가 없으면 에러
+    if (!newComment.postId) {
+      console.error("댓글 추가 오류: postId가 필요합니다")
+      return
+    }
+
     setCreateLoading(true)
     try {
       const data = await addComment(newComment)
       setNewComment({ body: "", postId: null, userId: 1 })
       onSuccess?.(data)
       return data
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("댓글 추가 오류:", error)
       throw error
     } finally {
@@ -35,7 +41,7 @@ export const useCommentManagement = () => {
       const data = await updateComment(selectedComment.id, { body: selectedComment.body })
       onSuccess?.()
       return data
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("댓글 업데이트 오류:", error)
       throw error
     } finally {
@@ -48,7 +54,7 @@ export const useCommentManagement = () => {
     try {
       await likeComment(id, currentLikes)
       onSuccess?.()
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("댓글 좋아요 오류:", error)
       throw error
     }
@@ -69,4 +75,3 @@ export const useCommentManagement = () => {
     handleLikeComment,
   }
 }
-

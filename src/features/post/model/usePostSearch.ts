@@ -14,7 +14,7 @@ export const usePostSearch = () => {
       const { posts: searchedPosts, total: searchedTotal } = await searchPosts(query)
       onSuccess?.(searchedPosts as PostWithAuthor[], searchedTotal)
       return { posts: searchedPosts, total: searchedTotal }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("게시물 검색 오류:", error)
       throw error
     } finally {
@@ -27,4 +27,3 @@ export const usePostSearch = () => {
     loading,
   }
 }
-
