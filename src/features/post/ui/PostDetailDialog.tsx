@@ -2,16 +2,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../share
 import { highlightText } from "../../../shared/lib/utils"
 import { PostWithAuthor } from "../../../entity/post"
 import { CommentList } from "../../../entity/comment/ui"
+import { Comment } from "../../../entity/comment"
 
 interface PostDetailDialogProps {
   post: PostWithAuthor | null
   open: boolean
   onOpenChange: (open: boolean) => void
-  comments: any[]
+  comments: Comment[]
   searchQuery?: string
   onAddComment: () => void
   onLikeComment: (id: number) => void
-  onEditComment: (comment: any) => void
+  onEditComment: (comment: Comment) => void
   onDeleteComment: (id: number) => void
 }
 

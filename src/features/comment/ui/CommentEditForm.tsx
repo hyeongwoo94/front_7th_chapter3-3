@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Textarea } from "../../../shared/ui"
 import { Comment } from "../../../entity/comment"
-import { useCommentEdit } from "../model/useCommentEdit"
+import { useCommentManagement } from "../model/useCommentManagement"
 
 interface CommentEditFormProps {
   comment: Comment | null
@@ -10,7 +10,7 @@ interface CommentEditFormProps {
 }
 
 export const CommentEditForm = ({ comment, open, onOpenChange, onSuccess }: CommentEditFormProps) => {
-  const { selectedComment, setSelectedComment, handleUpdateComment, loading } = useCommentEdit()
+  const { selectedComment, setSelectedComment, handleUpdateComment, editLoading } = useCommentManagement()
 
   // comment가 변경되면 selectedComment 업데이트
   if (comment && selectedComment?.id !== comment.id) {
@@ -38,8 +38,8 @@ export const CommentEditForm = ({ comment, open, onOpenChange, onSuccess }: Comm
             value={selectedComment.body || ""}
             onChange={(e) => setSelectedComment({ ...selectedComment, body: e.target.value })}
           />
-          <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? "수정 중..." : "댓글 업데이트"}
+          <Button onClick={handleSubmit} disabled={editLoading}>
+            {editLoading ? "수정 중..." : "댓글 업데이트"}
           </Button>
         </div>
       </DialogContent>

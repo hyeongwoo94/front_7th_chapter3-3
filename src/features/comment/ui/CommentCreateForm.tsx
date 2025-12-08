@@ -1,5 +1,5 @@
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Textarea } from "../../../shared/ui"
-import { useCommentCreate } from "../model/useCommentCreate"
+import { useCommentManagement } from "../model/useCommentManagement"
 
 interface CommentCreateFormProps {
   postId: number
@@ -9,7 +9,7 @@ interface CommentCreateFormProps {
 }
 
 export const CommentCreateForm = ({ postId, open, onOpenChange, onSuccess }: CommentCreateFormProps) => {
-  const { newComment, setNewComment, handleAddComment, loading } = useCommentCreate()
+  const { newComment, setNewComment, handleAddComment, createLoading } = useCommentManagement()
 
   const handleSubmit = async () => {
     await handleAddComment(() => {
@@ -30,8 +30,8 @@ export const CommentCreateForm = ({ postId, open, onOpenChange, onSuccess }: Com
             value={newComment.body}
             onChange={(e) => setNewComment({ ...newComment, body: e.target.value, postId })}
           />
-          <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? "추가 중..." : "댓글 추가"}
+          <Button onClick={handleSubmit} disabled={createLoading}>
+            {createLoading ? "추가 중..." : "댓글 추가"}
           </Button>
         </div>
       </DialogContent>

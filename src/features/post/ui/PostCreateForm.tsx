@@ -49,4 +49,3 @@ export const PostCreateForm = ({ open, onOpenChange, onSuccess }: PostCreateForm
     </Dialog>
   )
 }
-

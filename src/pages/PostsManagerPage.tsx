@@ -21,16 +21,18 @@ import {
 import { PostWithAuthor } from "../entity/post"
 import { Comment } from "../entity/comment"
 import { PostTableRow } from "../entity/post/ui"
-import { PostCreateForm } from "../features/post-create"
-import { PostEditForm } from "../features/post-edit"
-import { usePostDelete } from "../features/post-delete"
-import { usePostList } from "../features/post-list"
-import { PostSearchInput } from "../features/post-search"
-import { PostFilter, usePostFilter } from "../features/post-filter"
-import { PostDetailDialog, usePostDetail } from "../features/post-detail"
-import { CommentCreateForm } from "../features/comment-create"
-import { CommentEditForm } from "../features/comment-edit"
-import { useCommentLike } from "../features/comment-like"
+import {
+  PostCreateForm,
+  PostEditForm,
+  usePostDelete,
+  usePostList,
+  PostSearchInput,
+  PostFilter,
+  usePostFilter,
+  PostDetailDialog,
+  usePostDetail,
+} from "../features/post"
+import { CommentCreateForm, CommentEditForm, useCommentManagement } from "../features/comment"
 import { UserViewModal, useUserView } from "../features/user-view"
 import { deleteComment } from "../entity/comment"
 
@@ -50,7 +52,7 @@ const PostsManager = () => {
   // Features hooks
   const { posts, setPosts, total, setTotal, loading, reload } = usePostList({ limit, skip })
   const { handleDeletePost } = usePostDelete()
-  const { handleLikeComment } = useCommentLike()
+  const { handleLikeComment } = useCommentManagement()
   const { selectedPost, comments, openPostDetail, loadComments } = usePostDetail()
   const { selectedUser, openUserModal } = useUserView()
   const { handleFilterByTag } = usePostFilter()

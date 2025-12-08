@@ -1,11 +1,12 @@
 import { Search } from "lucide-react"
 import { Input } from "../../../shared/ui"
 import { usePostSearch } from "../model/usePostSearch"
+import { PostWithAuthor } from "../../../entity/post"
 
 interface PostSearchInputProps {
   searchQuery: string
   onSearchQueryChange: (query: string) => void
-  onSearch: (posts: any[], total: number) => void
+  onSearch: (posts: PostWithAuthor[], total: number) => void
 }
 
 export const PostSearchInput = ({ searchQuery, onSearchQueryChange, onSearch }: PostSearchInputProps) => {
