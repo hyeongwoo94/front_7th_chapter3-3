@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react"
-import { useAtom } from "jotai"
+import { useAtom, useAtomValue } from "jotai"
 import { Plus } from "lucide-react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { Button, Card, CardContent, CardHeader, CardTitle } from "../shared/ui"
@@ -32,13 +32,13 @@ const PostsManager = () => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  // Jotai atoms - 필터 및 페이지네이션 상태
-  const [skip, setSkip] = useAtom(skipAtom)
-  const [limit, setLimit] = useAtom(limitAtom)
-  const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom)
-  const [selectedTag, setSelectedTag] = useAtom(selectedTagAtom)
-  const [sortBy, setSortBy] = useAtom(sortByAtom)
-  const [sortOrder, setSortOrder] = useAtom(sortOrderAtom)
+  // Jotai atoms - 필터 및 페이지네이션 상태 (PostListWithFilters에서 직접 사용)
+  // const [skip, setSkip] = useAtom(skipAtom)
+  // const [limit, setLimit] = useAtom(limitAtom)
+  // const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom)
+  // const [selectedTag, setSelectedTag] = useAtom(selectedTagAtom)
+  // const [sortBy, setSortBy] = useAtom(sortByAtom)
+  // const [sortOrder, setSortOrder] = useAtom(sortOrderAtom)
 
   // Jotai atoms - UI 상태
   const [showAddDialog, setShowAddDialog] = useAtom(showAddDialogAtom)
@@ -60,6 +60,20 @@ const PostsManager = () => {
   const { handleLikeComment } = useCommentManagement()
   const { selectedPost, comments, openPostDetail, loadComments } = usePostDetail()
   const { selectedUser, openUserModal } = useUserView()
+
+  // atoms에서 값 읽기 (URL 동기화용)
+  const skip = useAtomValue(skipAtom)
+  const limit = useAtomValue(limitAtom)
+  const searchQuery = useAtomValue(searchQueryAtom)
+  const selectedTag = useAtomValue(selectedTagAtom)
+  const sortBy = useAtomValue(sortByAtom)
+  const sortOrder = useAtomValue(sortOrderAtom)
+  const setSkip = useAtom(skipAtom)[1]
+  const setLimit = useAtom(limitAtom)[1]
+  const setSearchQuery = useAtom(searchQueryAtom)[1]
+  const setSelectedTag = useAtom(selectedTagAtom)[1]
+  const setSortBy = useAtom(sortByAtom)[1]
+  const setSortOrder = useAtom(sortOrderAtom)[1]
 
   // URL 업데이트 함수
   const updateURL = useCallback(() => {
@@ -108,10 +122,6 @@ const PostsManager = () => {
     })
   }
 
-  // 태그 필터 핸들러
-  const handleTagFilter = () => {
-    updateURL()
-  }
 
   useEffect(() => {
     updateURL()
@@ -164,18 +174,6 @@ const PostsManager = () => {
       </CardHeader>
       <CardContent>
         <PostListWithFilters
-          limit={limit}
-          skip={skip}
-          searchQuery={searchQuery}
-          selectedTag={selectedTag}
-          sortBy={sortBy}
-          sortOrder={sortOrder}
-          onLimitChange={setLimit}
-          onSkipChange={setSkip}
-          onSearchQueryChange={setSearchQuery}
-          onTagChange={handleTagFilter}
-          onSortByChange={setSortBy}
-          onSortOrderChange={(value) => setSortOrder(value as "asc" | "desc")}
           onViewDetail={handleOpenPostDetail}
           onEdit={(post) => {
             setSelectedPostForEdit(post)
@@ -221,7 +219,6 @@ const PostsManager = () => {
         open={showPostDetailDialog}
         onOpenChange={setShowPostDetailDialog}
         comments={selectedPost ? comments[selectedPost.id] || [] : []}
-        searchQuery={searchQuery}
         onAddComment={() => {
           if (selectedPost) {
             setCurrentPostId(selectedPost.id)

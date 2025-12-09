@@ -1,4 +1,5 @@
 import { useEffect } from "react"
+import { useAtom } from "jotai"
 import { PostWithAuthor } from "../../../entity/post"
 import { PostTableRow } from "../../../entity/post/ui"
 import { PostSearchInput, PostFilter, usePostList, usePostFilter } from "../../../features/post"
@@ -15,20 +16,9 @@ import {
   TableHeader,
   TableRow,
 } from "../../../shared/ui"
+import { limitAtom, skipAtom, searchQueryAtom, selectedTagAtom } from "../../../app/store"
 
 interface PostListWithFiltersProps {
-  limit: number
-  skip: number
-  searchQuery: string
-  selectedTag: string
-  sortBy: string
-  sortOrder: string
-  onLimitChange: (limit: number) => void
-  onSkipChange: (skip: number) => void
-  onSearchQueryChange: (query: string) => void
-  onTagChange: (tag: string) => void
-  onSortByChange: (sortBy: string) => void
-  onSortOrderChange: (sortOrder: string) => void
   onViewDetail: (post: PostWithAuthor) => void
   onEdit: (post: PostWithAuthor) => void
   onDelete: (id: number) => void
@@ -38,18 +28,6 @@ interface PostListWithFiltersProps {
 }
 
 export const PostListWithFilters = ({
-  limit,
-  skip,
-  searchQuery,
-  selectedTag,
-  sortBy,
-  sortOrder,
-  onLimitChange,
-  onSkipChange,
-  onSearchQueryChange,
-  onTagChange,
-  onSortByChange,
-  onSortOrderChange,
   onViewDetail,
   onEdit,
   onDelete,
@@ -57,6 +35,10 @@ export const PostListWithFilters = ({
   refreshTrigger,
   localPosts = [],
 }: PostListWithFiltersProps) => {
+  const [limit, setLimit] = useAtom(limitAtom)
+  const [skip, setSkip] = useAtom(skipAtom)
+  const [searchQuery] = useAtom(searchQueryAtom)
+  const [selectedTag] = useAtom(selectedTagAtom)
   const { posts, setPosts, total, setTotal, loading, reload } = usePostList({ limit, skip })
   const { handleFilterByTag } = usePostFilter()
 
@@ -85,7 +67,6 @@ export const PostListWithFilters = ({
       setPosts(filteredPosts)
       setTotal(filteredTotal)
     })
-    onTagChange(tag)
   }
 
   // limit, skip 변경 시 자동으로 reload
@@ -104,19 +85,8 @@ export const PostListWithFilters = ({
     <div className="flex flex-col gap-4">
       {/* 검색 및 필터 컨트롤 */}
       <div className="flex gap-4">
-        <PostSearchInput
-          searchQuery={searchQuery}
-          onSearchQueryChange={onSearchQueryChange}
-          onSearch={handleSearchPosts}
-        />
-        <PostFilter
-          selectedTag={selectedTag}
-          sortBy={sortBy}
-          sortOrder={sortOrder}
-          onTagChange={handleTagFilter}
-          onSortByChange={onSortByChange}
-          onSortOrderChange={onSortOrderChange}
-        />
+        <PostSearchInput onSearch={handleSearchPosts} />
+        <PostFilter />
       </div>
 
       {/* 게시물 테이블 */}
@@ -138,9 +108,7 @@ export const PostListWithFilters = ({
               <PostTableRow
                 key={post.id}
                 post={post}
-                searchQuery={searchQuery}
-                selectedTag={selectedTag}
-                onTagClick={(tag) => handleTagFilter(tag)}
+                onTagClick={handleTagFilter}
                 onViewDetail={() => onViewDetail(post)}
                 onEdit={() => onEdit(post)}
                 onDelete={() => onDelete(post.id)}
@@ -155,7 +123,7 @@ export const PostListWithFilters = ({
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <span>표시</span>
-          <Select value={limit.toString()} onValueChange={(value) => onLimitChange(Number(value))}>
+          <Select value={limit.toString()} onValueChange={(value) => setLimit(Number(value))}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="10" />
             </SelectTrigger>
@@ -168,10 +136,10 @@ export const PostListWithFilters = ({
           <span>항목</span>
         </div>
         <div className="flex gap-2">
-          <Button disabled={skip === 0} onClick={() => onSkipChange(Math.max(0, skip - limit))}>
+          <Button disabled={skip === 0} onClick={() => setSkip(Math.max(0, skip - limit))}>
             이전
           </Button>
-          <Button disabled={skip + limit >= total} onClick={() => onSkipChange(skip + limit)}>
+          <Button disabled={skip + limit >= total} onClick={() => setSkip(skip + limit)}>
             다음
           </Button>
         </div>

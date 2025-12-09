@@ -1,15 +1,16 @@
+import { useAtom } from "jotai"
 import { Search } from "lucide-react"
 import { Input } from "../../../shared/ui"
 import { usePostSearch } from "../model/usePostSearch"
 import { PostWithAuthor } from "../../../entity/post"
+import { searchQueryAtom } from "../../../app/store"
 
 interface PostSearchInputProps {
-  searchQuery: string
-  onSearchQueryChange: (query: string) => void
-  onSearch: (posts: PostWithAuthor[], total: number) => void
+  onSearch?: (posts: PostWithAuthor[], total: number) => void
 }
 
-export const PostSearchInput = ({ searchQuery, onSearchQueryChange, onSearch }: PostSearchInputProps) => {
+export const PostSearchInput = ({ onSearch }: PostSearchInputProps) => {
+  const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom)
   const { handleSearch, loading } = usePostSearch()
 
   const handleKeyPress = async (e: React.KeyboardEvent) => {
@@ -26,7 +27,7 @@ export const PostSearchInput = ({ searchQuery, onSearchQueryChange, onSearch }: 
           placeholder="게시물 검색..."
           className="pl-8"
           value={searchQuery}
-          onChange={(e) => onSearchQueryChange(e.target.value)}
+          onChange={(e) => setSearchQuery(e.target.value)}
           onKeyPress={handleKeyPress}
           disabled={loading}
         />

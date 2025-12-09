@@ -1,27 +1,13 @@
+import { useAtom } from "jotai"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../shared/ui"
 import { usePostFilter } from "../model/usePostFilter"
+import { selectedTagAtom, sortByAtom, sortOrderAtom } from "../../../app/store"
 
-interface PostFilterProps {
-  selectedTag?: string
-  sortBy?: string
-  sortOrder?: string
-  onTagChange?: (tag: string) => void
-  onSortByChange?: (sortBy: string) => void
-  onSortOrderChange?: (sortOrder: string) => void
-}
-
-export const PostFilter = ({
-  selectedTag: externalSelectedTag,
-  sortBy: externalSortBy,
-  sortOrder: externalSortOrder,
-  onTagChange,
-  onSortByChange,
-  onSortOrderChange,
-}: PostFilterProps) => {
+export const PostFilter = () => {
   const { tags } = usePostFilter()
-  const selectedTag = externalSelectedTag || ""
-  const sortBy = externalSortBy || ""
-  const sortOrder = externalSortOrder || "asc"
+  const [selectedTag, setSelectedTag] = useAtom(selectedTagAtom)
+  const [sortBy, setSortBy] = useAtom(sortByAtom)
+  const [sortOrder, setSortOrder] = useAtom(sortOrderAtom)
 
   return (
     <div className="flex gap-4">
@@ -29,7 +15,7 @@ export const PostFilter = ({
         value={selectedTag || "all"}
         onValueChange={(value) => {
           // "all"을 선택하면 빈 문자열로 변환
-          onTagChange?.(value === "all" ? "" : value)
+          setSelectedTag(value === "all" ? "" : value)
         }}
       >
         <SelectTrigger className="w-[180px]">
@@ -44,7 +30,7 @@ export const PostFilter = ({
           ))}
         </SelectContent>
       </Select>
-      <Select value={sortBy} onValueChange={(value) => onSortByChange?.(value)}>
+      <Select value={sortBy} onValueChange={setSortBy}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="정렬 기준" />
         </SelectTrigger>
@@ -55,7 +41,7 @@ export const PostFilter = ({
           <SelectItem value="reactions">반응</SelectItem>
         </SelectContent>
       </Select>
-      <Select value={sortOrder} onValueChange={(value) => onSortOrderChange?.(value)}>
+      <Select value={sortOrder} onValueChange={(value) => setSortOrder(value as "asc" | "desc")}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="정렬 순서" />
         </SelectTrigger>

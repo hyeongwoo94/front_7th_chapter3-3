@@ -1,15 +1,16 @@
+import { useAtomValue } from "jotai"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../shared/ui"
 import { highlightText } from "../../../shared/lib/utils"
 import { PostWithAuthor } from "../../../entity/post"
 import { CommentList } from "../../../entity/comment/ui"
 import { Comment } from "../../../entity/comment"
+import { searchQueryAtom } from "../../../app/store"
 
 interface PostDetailDialogProps {
   post: PostWithAuthor | null
   open: boolean
   onOpenChange: (open: boolean) => void
   comments: Comment[]
-  searchQuery?: string
   onAddComment: () => void
   onLikeComment: (id: number) => void
   onEditComment: (comment: Comment) => void
@@ -21,12 +22,13 @@ export const PostDetailDialog = ({
   open,
   onOpenChange,
   comments,
-  searchQuery = "",
   onAddComment,
   onLikeComment,
   onEditComment,
   onDeleteComment,
 }: PostDetailDialogProps) => {
+  const searchQuery = useAtomValue(searchQueryAtom)
+  
   if (!post) return null
 
   return (

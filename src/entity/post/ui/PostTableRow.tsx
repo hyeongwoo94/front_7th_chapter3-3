@@ -1,3 +1,4 @@
+import { useAtom } from "jotai"
 import { PostWithAuthor } from "../model/types"
 import { PostTitle } from "./PostTitle"
 import { PostReactions } from "./PostReactions"
@@ -5,11 +6,10 @@ import { PostActions } from "./PostActions"
 import { TagBadge } from "../../tag/ui/TagBadge"
 import { UserAvatar } from "../../user/ui/UserAvatar"
 import { TableCell, TableRow } from "../../../shared/ui"
+import { searchQueryAtom, selectedTagAtom } from "../../../app/store"
 
 interface PostTableRowProps {
   post: PostWithAuthor
-  searchQuery?: string
-  selectedTag?: string
   onTagClick: (tag: string) => void
   onViewDetail: () => void
   onEdit: () => void
@@ -17,16 +17,9 @@ interface PostTableRowProps {
   onUserClick: () => void
 }
 
-export const PostTableRow = ({
-  post,
-  searchQuery = "",
-  selectedTag,
-  onTagClick,
-  onViewDetail,
-  onEdit,
-  onDelete,
-  onUserClick,
-}: PostTableRowProps) => {
+export const PostTableRow = ({ post, onTagClick, onViewDetail, onEdit, onDelete, onUserClick }: PostTableRowProps) => {
+  const [searchQuery] = useAtom(searchQueryAtom)
+  const [selectedTag] = useAtom(selectedTagAtom)
   return (
     <TableRow>
       <TableCell>{post.id}</TableCell>
