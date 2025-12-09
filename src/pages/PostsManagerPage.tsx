@@ -1,28 +1,57 @@
 import { useEffect, useState, useCallback } from "react"
+import { useAtom } from "jotai"
 import { Plus } from "lucide-react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { Button, Card, CardContent, CardHeader, CardTitle } from "../shared/ui"
 import { PostWithAuthor } from "../entity/post"
-import { Comment } from "../entity/comment"
 import { PostCreateForm, PostEditForm, usePostDelete, PostDetailDialog, usePostDetail } from "../features/post"
 import { CommentCreateForm, CommentEditForm, useCommentManagement } from "../features/comment"
 import { UserViewModal, useUserView } from "../features/user-view"
 import { deleteComment } from "../entity/comment"
 import { fetchUser } from "../entity/user"
 import { PostListWithFilters } from "../widgets/PostListWithFilters"
+import {
+  searchQueryAtom,
+  selectedTagAtom,
+  sortByAtom,
+  sortOrderAtom,
+  skipAtom,
+  limitAtom,
+  showAddDialogAtom,
+  showEditDialogAtom,
+  showAddCommentDialogAtom,
+  showEditCommentDialogAtom,
+  showPostDetailDialogAtom,
+  showUserModalAtom,
+  selectedPostForEditAtom,
+  selectedCommentAtom,
+  currentPostIdAtom,
+} from "../app/store"
 
 const PostsManager = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
 
-  // 페이지네이션 상태
-  const [skip, setSkip] = useState(parseInt(queryParams.get("skip") || "0"))
-  const [limit, setLimit] = useState(parseInt(queryParams.get("limit") || "10"))
-  const [searchQuery, setSearchQuery] = useState(queryParams.get("search") || "")
-  const [selectedTag, setSelectedTag] = useState(queryParams.get("tag") || "")
-  const [sortBy, setSortBy] = useState(queryParams.get("sortBy") || "")
-  const [sortOrder, setSortOrder] = useState(queryParams.get("sortOrder") || "asc")
+  // Jotai atoms - 필터 및 페이지네이션 상태
+  const [skip, setSkip] = useAtom(skipAtom)
+  const [limit, setLimit] = useAtom(limitAtom)
+  const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom)
+  const [selectedTag, setSelectedTag] = useAtom(selectedTagAtom)
+  const [sortBy, setSortBy] = useAtom(sortByAtom)
+  const [sortOrder, setSortOrder] = useAtom(sortOrderAtom)
+
+  // Jotai atoms - UI 상태
+  const [showAddDialog, setShowAddDialog] = useAtom(showAddDialogAtom)
+  const [showEditDialog, setShowEditDialog] = useAtom(showEditDialogAtom)
+  const [selectedPostForEdit, setSelectedPostForEdit] = useAtom(selectedPostForEditAtom)
+  const [showAddCommentDialog, setShowAddCommentDialog] = useAtom(showAddCommentDialogAtom)
+  const [showEditCommentDialog, setShowEditCommentDialog] = useAtom(showEditCommentDialogAtom)
+  const [selectedComment, setSelectedComment] = useAtom(selectedCommentAtom)
+  const [showPostDetailDialog, setShowPostDetailDialog] = useAtom(showPostDetailDialogAtom)
+  const [showUserModal, setShowUserModal] = useAtom(showUserModalAtom)
+  const [currentPostId, setCurrentPostId] = useAtom(currentPostIdAtom)
+
+  // 로컬 상태 (필요한 경우에만)
   const [refreshTrigger, setRefreshTrigger] = useState(0)
   const [localPosts, setLocalPosts] = useState<PostWithAuthor[]>([])
 
@@ -32,17 +61,6 @@ const PostsManager = () => {
   const { selectedPost, comments, openPostDetail, loadComments } = usePostDetail()
   const { selectedUser, openUserModal } = useUserView()
 
-  // 다이얼로그 상태
-  const [showAddDialog, setShowAddDialog] = useState(false)
-  const [showEditDialog, setShowEditDialog] = useState(false)
-  const [selectedPostForEdit, setSelectedPostForEdit] = useState<PostWithAuthor | null>(null)
-  const [showAddCommentDialog, setShowAddCommentDialog] = useState(false)
-  const [showEditCommentDialog, setShowEditCommentDialog] = useState(false)
-  const [selectedComment, setSelectedComment] = useState<Comment | null>(null)
-  const [showPostDetailDialog, setShowPostDetailDialog] = useState(false)
-  const [showUserModal, setShowUserModal] = useState(false)
-  const [currentPostId, setCurrentPostId] = useState<number | null>(null)
-
   // URL 업데이트 함수
   const updateURL = useCallback(() => {
     const params = new URLSearchParams()
@@ -50,8 +68,10 @@ const PostsManager = () => {
     if (limit) params.set("limit", limit.toString())
     if (searchQuery) params.set("search", searchQuery)
     if (selectedTag) params.set("tag", selectedTag)
+    if (sortBy) params.set("sortBy", sortBy)
+    if (sortOrder) params.set("sortOrder", sortOrder)
     navigate(`?${params.toString()}`)
-  }, [skip, limit, searchQuery, selectedTag, navigate])
+  }, [skip, limit, searchQuery, selectedTag, sortBy, sortOrder, navigate])
 
   // 게시물 삭제 핸들러
   const handleDelete = async (id: number) => {
@@ -97,7 +117,7 @@ const PostsManager = () => {
     updateURL()
   }, [updateURL])
 
-  // URL 파라미터에서 초기값 읽기
+  // URL 파라미터에서 초기값 읽기 및 atoms 동기화
   useEffect(() => {
     const params = new URLSearchParams(location.search)
     const skipParam = params.get("skip")
@@ -107,30 +127,26 @@ const PostsManager = () => {
     const sortByParam = params.get("sortBy")
     const sortOrderParam = params.get("sortOrder")
 
-    // URL 파라미터가 현재 state와 다를 때만 업데이트 (무한 루프 방지)
-    const newSkip = skipParam !== null ? parseInt(skipParam || "0") : skip
-    const newLimit = limitParam !== null ? parseInt(limitParam || "10") : limit
-    const newSearchQuery = searchParam !== null ? searchParam : searchQuery
-    const newSelectedTag = tagParam !== null ? tagParam : selectedTag
-    const newSortBy = sortByParam !== null ? sortByParam : sortBy
-    const newSortOrder = sortOrderParam !== null ? sortOrderParam : sortOrder
-
-    // 배치 업데이트로 여러 setState 호출 최소화
-    if (
-      newSkip !== skip ||
-      newLimit !== limit ||
-      newSearchQuery !== searchQuery ||
-      newSelectedTag !== selectedTag ||
-      newSortBy !== sortBy ||
-      newSortOrder !== sortOrder
-    ) {
-      // React의 배치 업데이트를 활용하기 위해 각각 호출하되, 조건부로만 실행
+    // URL 파라미터가 현재 atom 값과 다를 때만 업데이트 (무한 루프 방지)
+    if (skipParam !== null) {
+      const newSkip = parseInt(skipParam || "0")
       if (newSkip !== skip) setSkip(newSkip)
+    }
+    if (limitParam !== null) {
+      const newLimit = parseInt(limitParam || "10")
       if (newLimit !== limit) setLimit(newLimit)
-      if (newSearchQuery !== searchQuery) setSearchQuery(newSearchQuery)
-      if (newSelectedTag !== selectedTag) setSelectedTag(newSelectedTag)
-      if (newSortBy !== sortBy) setSortBy(newSortBy)
-      if (newSortOrder !== sortOrder) setSortOrder(newSortOrder)
+    }
+    if (searchParam !== null && searchParam !== searchQuery) {
+      setSearchQuery(searchParam)
+    }
+    if (tagParam !== null && tagParam !== selectedTag) {
+      setSelectedTag(tagParam)
+    }
+    if (sortByParam !== null && sortByParam !== sortBy) {
+      setSortBy(sortByParam)
+    }
+    if (sortOrderParam !== null && sortOrderParam !== sortOrder) {
+      setSortOrder(sortOrderParam as "asc" | "desc")
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search])
@@ -159,7 +175,7 @@ const PostsManager = () => {
           onSearchQueryChange={setSearchQuery}
           onTagChange={handleTagFilter}
           onSortByChange={setSortBy}
-          onSortOrderChange={setSortOrder}
+          onSortOrderChange={(value) => setSortOrder(value as "asc" | "desc")}
           onViewDetail={handleOpenPostDetail}
           onEdit={(post) => {
             setSelectedPostForEdit(post)
