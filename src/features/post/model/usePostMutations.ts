@@ -25,7 +25,7 @@ export const useCreatePostMutation = () => {
         if (Array.isArray(old)) return old
         return {
           ...old,
-          posts: [...(old.posts || []), { ...newPost, id: tempId, reactions: 0 } as Post],
+          posts: [...(old.posts || []), { ...newPost, id: tempId, reactions: { likes: 0, dislikes: 0 } } as Post],
           total: (old.total || 0) + 1,
         }
       })
