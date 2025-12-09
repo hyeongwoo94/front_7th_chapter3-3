@@ -7,7 +7,7 @@ interface CommentEditFormProps {
   comment: Comment | null
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSuccess?: () => void
+  onSuccess?: (updatedComment: Comment) => void
 }
 
 export const CommentEditForm = ({ comment, open, onOpenChange, onSuccess }: CommentEditFormProps) => {
@@ -42,7 +42,7 @@ export const CommentEditForm = ({ comment, open, onOpenChange, onSuccess }: Comm
       const data = await updateComment(selectedComment.id, { body: selectedComment.body })
       console.log("댓글 수정 성공:", data)
       onOpenChange(false)
-      onSuccess?.()
+      onSuccess?.(data)
     } catch (error: unknown) {
       console.error("댓글 업데이트 오류:", error)
       alert("댓글 수정에 실패했습니다. 콘솔을 확인하세요.")

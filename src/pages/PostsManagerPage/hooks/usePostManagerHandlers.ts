@@ -3,7 +3,7 @@ import { PostWithAuthor } from "../../../entity/post"
 import { usePostDelete, usePostDetail } from "../../../features/post"
 import { useCommentManagement } from "../../../features/comment"
 import { useUserView } from "../../../features/user-view"
-import { deleteComment } from "../../../entity/comment"
+import { deleteComment, Comment } from "../../../entity/comment"
 import { fetchUser } from "../../../entity/user"
 
 /**
@@ -12,17 +12,37 @@ import { fetchUser } from "../../../entity/user"
 export const usePostManagerHandlers = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0)
   const [localPosts, setLocalPosts] = useState<PostWithAuthor[]>([])
+  const [updatedPost, setUpdatedPost] = useState<PostWithAuthor | null>(null)
+  const [deletedPostId, setDeletedPostId] = useState<number | null>(null)
 
   // Features hooks
   const { handleDeletePost } = usePostDelete()
-  const { selectedPost, comments, openPostDetail, loadComments } = usePostDetail()
+  const {
+    selectedPost,
+    comments,
+    openPostDetail,
+    loadComments,
+    addCommentToPost,
+    updateCommentInPost,
+    removeCommentFromPost,
+  } = usePostDetail()
   const { handleLikeComment } = useCommentManagement()
   const { selectedUser, openUserModal: openUserModalHook } = useUserView()
 
-  // 게시물 삭제 핸들러
+  // 게시물 삭제 핸들러 (리스트 재렌더링 없이 로컬 상태만 업데이트)
   const handleDelete = async (id: number) => {
-    await handleDeletePost(id)
-    setRefreshTrigger((prev) => prev + 1)
+    try {
+      await handleDeletePost(id)
+      // 로컬 posts에서도 삭제된 게시물 제거
+      setLocalPosts((prev) => prev.filter((post) => post.id !== id))
+      // 삭제된 게시물 ID를 상태로 설정 (PostListWithFilters에서 리스트에서 제거용)
+      setDeletedPostId(id)
+      // refreshTrigger는 증가시키지 않음 (전체 리스트 재렌더링 방지)
+    } catch (error: unknown) {
+      console.error("게시물 삭제 오류:", error)
+      alert("게시물 삭제에 실패했습니다.")
+      throw error
+    }
   }
 
   // 게시물 상세 보기 핸들러
@@ -40,27 +60,45 @@ export const usePostManagerHandlers = () => {
     }
   }
 
-  // 댓글 삭제 핸들러
+  // 댓글 삭제 핸들러 (리스트 재렌더링 없이 로컬 상태만 업데이트)
   const handleDeleteComment = async (id: number, postId: number) => {
     try {
       console.log("댓글 삭제 시도:", id)
       await deleteComment(id)
       console.log("댓글 삭제 성공")
-      // comments 상태 업데이트는 usePostDetail에서 관리 (강제로 다시 불러오기)
-      await loadComments(postId, true)
+      // 로컬 상태에서만 댓글 제거 (전체 리스트 재렌더링 방지)
+      removeCommentFromPost(postId, id)
     } catch (error: unknown) {
       console.error("댓글 삭제 오류:", error)
       alert("댓글 삭제에 실패했습니다. 콘솔을 확인하세요.")
     }
   }
 
-  // 댓글 좋아요 핸들러
+  // 댓글 좋아요 핸들러 (리스트 재렌더링 없이 로컬 상태만 업데이트)
   const handleLike = async (id: number, postId: number) => {
     const currentComment = comments[postId]?.find((c) => c.id === id)
     if (!currentComment) return
-    await handleLikeComment(id, currentComment.likes, async () => {
-      await loadComments(postId)
-    })
+    try {
+      const updatedComment = await handleLikeComment(id, currentComment.likes)
+      // 로컬 상태에서만 댓글 업데이트 (전체 리스트 재렌더링 방지)
+      if (updatedComment) {
+        updateCommentInPost(postId, updatedComment)
+      }
+    } catch (error: unknown) {
+      console.error("댓글 좋아요 오류:", error)
+    }
+  }
+
+  // 댓글 생성 성공 핸들러 (리스트 재렌더링 없이 로컬 상태만 업데이트)
+  const handleCommentCreateSuccess = (comment: Comment, postId: number) => {
+    // 로컬 상태에만 댓글 추가 (전체 리스트 재렌더링 방지)
+    addCommentToPost(postId, comment)
+  }
+
+  // 댓글 수정 성공 핸들러 (리스트 재렌더링 없이 로컬 상태만 업데이트)
+  const handleCommentEditSuccess = (updatedComment: Comment, postId: number) => {
+    // 로컬 상태에서만 댓글 업데이트 (전체 리스트 재렌더링 방지)
+    updateCommentInPost(postId, updatedComment)
   }
 
   // 게시물 생성 성공 핸들러
@@ -70,18 +108,23 @@ export const usePostManagerHandlers = () => {
     setRefreshTrigger((prev) => prev + 1)
   }
 
-  // 게시물 수정 성공 핸들러
-  const handlePostEditSuccess = () => {
-    setRefreshTrigger((prev) => prev + 1)
+  // 게시물 수정 성공 핸들러 (리스트 재렌더링 없이 로컬 상태만 업데이트)
+  const handlePostEditSuccess = (updated: PostWithAuthor) => {
+    // 로컬 posts 업데이트 (검색 시 포함되도록)
+    setLocalPosts((prev) => prev.map((post) => (post.id === updated.id ? updated : post)))
+    // 수정된 게시물을 상태로 설정 (PostListWithFilters에서 리스트 업데이트용)
+    setUpdatedPost(updated)
+    // refreshTrigger는 증가시키지 않음 (전체 리스트 재렌더링 방지)
   }
 
   return {
     refreshTrigger,
     localPosts,
+    updatedPost,
+    deletedPostId,
     selectedPost,
     comments,
     selectedUser,
-    loadComments,
     handleDelete,
     handleOpenPostDetail,
     handleDeleteComment,
@@ -89,6 +132,8 @@ export const usePostManagerHandlers = () => {
     handleUserClick,
     handlePostCreateSuccess,
     handlePostEditSuccess,
+    handleCommentCreateSuccess,
+    handleCommentEditSuccess,
   }
 }
 

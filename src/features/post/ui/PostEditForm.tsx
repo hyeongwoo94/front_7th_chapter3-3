@@ -6,7 +6,7 @@ interface PostEditFormProps {
   post: PostWithAuthor | null
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSuccess?: () => void
+  onSuccess?: (updatedPost: PostWithAuthor) => void
 }
 
 export const PostEditForm = ({ post, open, onOpenChange, onSuccess }: PostEditFormProps) => {
@@ -18,10 +18,15 @@ export const PostEditForm = ({ post, open, onOpenChange, onSuccess }: PostEditFo
   }
 
   const handleSubmit = async () => {
-    await handleUpdatePost(() => {
-      onOpenChange(false)
-      onSuccess?.()
-    })
+    try {
+      await handleUpdatePost((updatedPost) => {
+        onOpenChange(false)
+        onSuccess?.(updatedPost)
+      })
+    } catch (error) {
+      console.error("게시물 수정 실패:", error)
+      alert("게시물 수정에 실패했습니다.")
+    }
   }
 
   if (!selectedPost) return null

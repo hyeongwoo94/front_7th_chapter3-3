@@ -6,7 +6,7 @@ interface CommentCreateFormProps {
   postId: number
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSuccess?: () => void
+  onSuccess?: (comment: Comment) => void
 }
 
 export const CommentCreateForm = ({ postId, open, onOpenChange, onSuccess }: CommentCreateFormProps) => {
@@ -34,7 +34,7 @@ export const CommentCreateForm = ({ postId, open, onOpenChange, onSuccess }: Com
       console.log("댓글 추가 성공:", data)
       setNewComment({ body: "", postId, userId: 1 })
       onOpenChange(false)
-      onSuccess?.()
+      onSuccess?.(data)
       return data
     } catch (error: unknown) {
       console.error("댓글 추가 오류:", error)

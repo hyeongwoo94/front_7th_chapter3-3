@@ -25,14 +25,15 @@ interface PostManagerDialogsProps {
   currentPostId: number | null
   // 핸들러
   onPostCreateSuccess: (post: PostWithAuthor) => void
-  onPostEditSuccess: () => void
+  onPostEditSuccess: (updatedPost: PostWithAuthor) => void
   onDeleteComment: (id: number, postId: number) => void
   onLikeComment: (id: number, postId: number) => void
   onAddComment: (postId: number) => void
   onEditComment: (comment: Comment) => void
+  onCommentCreateSuccess: (comment: Comment, postId: number) => void
+  onCommentEditSuccess: (updatedComment: Comment, postId: number) => void
   selectedPost: PostWithAuthor | null
   comments: Record<number, Comment[]>
-  loadComments: (postId: number, force?: boolean) => Promise<void>
   selectedUser: User | null
 }
 
@@ -58,9 +59,10 @@ export const PostManagerDialogs = ({
   onLikeComment,
   onAddComment,
   onEditComment,
+  onCommentCreateSuccess,
+  onCommentEditSuccess,
   selectedPost,
   comments,
-  loadComments,
   selectedUser,
 }: PostManagerDialogsProps) => {
   return (
@@ -105,9 +107,9 @@ export const PostManagerDialogs = ({
         postId={currentPostId || 0}
         open={showAddCommentDialog && !!currentPostId}
         onOpenChange={setShowAddCommentDialog}
-        onSuccess={async () => {
+        onSuccess={(comment) => {
           if (selectedPost) {
-            await loadComments(selectedPost.id, true)
+            onCommentCreateSuccess(comment, selectedPost.id)
           }
         }}
       />
@@ -116,9 +118,9 @@ export const PostManagerDialogs = ({
         comment={selectedComment}
         open={showEditCommentDialog}
         onOpenChange={setShowEditCommentDialog}
-        onSuccess={async () => {
+        onSuccess={(updatedComment) => {
           if (selectedPost) {
-            await loadComments(selectedPost.id, true)
+            onCommentEditSuccess(updatedComment, selectedPost.id)
           }
         }}
       />

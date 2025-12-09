@@ -45,6 +45,33 @@ export const usePostDetail = () => {
     [loadComments],
   )
 
+  // 댓글 추가 (로컬 상태만 업데이트)
+  const addCommentToPost = useCallback((postId: number, comment: Comment) => {
+    setComments((prev) => {
+      const existingComments = prev[postId] || []
+      return { ...prev, [postId]: [...existingComments, comment] }
+    })
+  }, [])
+
+  // 댓글 수정 (로컬 상태만 업데이트)
+  const updateCommentInPost = useCallback((postId: number, updatedComment: Comment) => {
+    setComments((prev) => {
+      const existingComments = prev[postId] || []
+      return {
+        ...prev,
+        [postId]: existingComments.map((c) => (c.id === updatedComment.id ? updatedComment : c)),
+      }
+    })
+  }, [])
+
+  // 댓글 삭제 (로컬 상태만 업데이트)
+  const removeCommentFromPost = useCallback((postId: number, commentId: number) => {
+    setComments((prev) => {
+      const existingComments = prev[postId] || []
+      return { ...prev, [postId]: existingComments.filter((c) => c.id !== commentId) }
+    })
+  }, [])
+
   return {
     selectedPost,
     setSelectedPost,
@@ -52,5 +79,8 @@ export const usePostDetail = () => {
     openPostDetail,
     loadComments,
     loading,
+    addCommentToPost,
+    updateCommentInPost,
+    removeCommentFromPost,
   }
 }

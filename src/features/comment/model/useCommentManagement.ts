@@ -50,10 +50,11 @@ export const useCommentManagement = () => {
   }
 
   // 댓글 좋아요
-  const handleLikeComment = async (id: number, currentLikes: number, onSuccess?: () => void) => {
+  const handleLikeComment = async (id: number, currentLikes: number, onSuccess?: () => void): Promise<Comment | undefined> => {
     try {
-      await likeComment(id, currentLikes)
+      const updatedComment = await likeComment(id, currentLikes)
       onSuccess?.()
+      return updatedComment
     } catch (error: unknown) {
       console.error("댓글 좋아요 오류:", error)
       throw error

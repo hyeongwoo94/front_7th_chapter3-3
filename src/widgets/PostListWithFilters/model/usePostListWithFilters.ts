@@ -44,6 +44,17 @@ export const usePostListWithFilters = ({ refreshTrigger, localPosts = [] }: UseP
     })
   }
 
+  // 게시물 업데이트 핸들러 (수정된 게시물을 리스트에 반영)
+  const updatePostInList = (updatedPost: PostWithAuthor) => {
+    setPosts((prev) => prev.map((post) => (post.id === updatedPost.id ? updatedPost : post)))
+  }
+
+  // 게시물 삭제 핸들러 (리스트에서 게시물 제거)
+  const removePostFromList = (postId: number) => {
+    setPosts((prev) => prev.filter((post) => post.id !== postId))
+    setTotal((prev) => Math.max(0, prev - 1))
+  }
+
   // limit, skip 변경 시 자동으로 reload
   useEffect(() => {
     reload()
@@ -62,6 +73,8 @@ export const usePostListWithFilters = ({ refreshTrigger, localPosts = [] }: UseP
     loading,
     handleSearchPosts,
     handleTagFilter,
+    updatePostInList,
+    removePostFromList,
   }
 }
 

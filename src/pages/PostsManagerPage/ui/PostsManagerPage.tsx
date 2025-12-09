@@ -15,10 +15,11 @@ const PostsManager = () => {
   const {
     refreshTrigger,
     localPosts,
+    updatedPost,
+    deletedPostId,
     selectedPost,
     comments,
     selectedUser,
-    loadComments,
     handleDelete,
     handleOpenPostDetail,
     handleDeleteComment,
@@ -26,6 +27,8 @@ const PostsManager = () => {
     handleUserClick,
     handlePostCreateSuccess,
     handlePostEditSuccess,
+    handleCommentCreateSuccess,
+    handleCommentEditSuccess,
   } = usePostManagerHandlers()
 
   // 다이얼로그 관리
@@ -69,6 +72,8 @@ const PostsManager = () => {
           onUserClick={handleUserClick}
           refreshTrigger={refreshTrigger}
           localPosts={localPosts}
+          updatedPost={updatedPost}
+          deletedPostId={deletedPostId}
         />
       </CardContent>
 
@@ -94,9 +99,10 @@ const PostsManager = () => {
         onLikeComment={handleLike}
         onAddComment={openAddCommentDialog}
         onEditComment={openEditCommentDialog}
+        onCommentCreateSuccess={handleCommentCreateSuccess}
+        onCommentEditSuccess={handleCommentEditSuccess}
         selectedPost={selectedPost}
         comments={comments}
-        loadComments={loadComments}
         selectedUser={selectedUser}
       />
     </Card>
