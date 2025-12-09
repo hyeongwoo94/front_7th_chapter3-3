@@ -21,7 +21,7 @@ export const PostFilter = () => {
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="태그 선택" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="max-h-[200px] overflow-y-auto">
           <SelectItem value="all">모든 태그</SelectItem>
           {tags.map((tag) => (
             <SelectItem key={tag.url} value={tag.slug}>

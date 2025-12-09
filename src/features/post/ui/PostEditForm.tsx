@@ -1,25 +1,24 @@
 import { useState, useEffect } from "react"
+import { useAtom } from "jotai"
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea } from "../../../shared/ui"
 import { PostWithAuthor } from "../../../entity/post"
 import { useUpdatePostMutation } from "../model/usePostMutations"
+import { showEditDialogAtom, selectedPostForEditAtom } from "../../../app/store"
+import { usePostManagerHandlers } from "../../../pages/PostsManagerPage/hooks/usePostManagerHandlers"
 
-interface PostEditFormProps {
-  post: PostWithAuthor | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSuccess?: (updatedPost: PostWithAuthor) => void
-}
-
-export const PostEditForm = ({ post, open, onOpenChange, onSuccess }: PostEditFormProps) => {
+export const PostEditForm = () => {
+  const [open, setOpen] = useAtom(showEditDialogAtom)
+  const [selectedPostForEdit] = useAtom(selectedPostForEditAtom)
   const [selectedPost, setSelectedPost] = useState<PostWithAuthor | null>(null)
   const updatePostMutation = useUpdatePostMutation()
+  const { handlePostEditSuccess } = usePostManagerHandlers()
 
-  // post가 변경되면 selectedPost 업데이트
+  // selectedPostForEdit가 변경되면 selectedPost 업데이트
   useEffect(() => {
-    if (post) {
-      setSelectedPost(post)
+    if (selectedPostForEdit) {
+      setSelectedPost(selectedPostForEdit)
     }
-  }, [post])
+  }, [selectedPostForEdit])
 
   const handleSubmit = async () => {
     if (!selectedPost) return
@@ -29,13 +28,13 @@ export const PostEditForm = ({ post, open, onOpenChange, onSuccess }: PostEditFo
         id: selectedPost.id,
         post: selectedPost,
       })
-      onOpenChange(false)
+      setOpen(false)
       // Post를 PostWithAuthor로 변환 (author 정보는 기존 것 유지)
       const updatedPostWithAuthor: PostWithAuthor = {
         ...updatedPost,
         author: selectedPost.author,
       }
-      onSuccess?.(updatedPostWithAuthor)
+      handlePostEditSuccess(updatedPostWithAuthor)
     } catch (error) {
       console.error("게시물 수정 실패:", error)
       alert("게시물 수정에 실패했습니다.")
@@ -45,7 +44,7 @@ export const PostEditForm = ({ post, open, onOpenChange, onSuccess }: PostEditFo
   if (!selectedPost) return null
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>게시물 수정</DialogTitle>

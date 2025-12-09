@@ -21,5 +21,8 @@ export {
   selectedPostForEditAtom,
   selectedCommentAtom,
   currentPostIdAtom,
+  selectedPostAtom,
+  selectedUserAtom,
+  localPostsAtom,
 } from "./uiAtoms"
 

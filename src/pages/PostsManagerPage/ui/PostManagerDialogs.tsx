@@ -1,135 +1,17 @@
-import { PostWithAuthor } from "../../../entity/post"
-import { Comment } from "../../../entity/comment"
-import { User } from "../../../entity/user"
 import { PostCreateForm, PostEditForm, PostDetailDialog } from "../../../features/post"
 import { CommentCreateForm, CommentEditForm } from "../../../features/comment"
 import { UserViewModal } from "../../../features/user-view"
 
-interface PostManagerDialogsProps {
-  // 다이얼로그 표시 상태
-  showAddDialog: boolean
-  setShowAddDialog: (open: boolean) => void
-  showEditDialog: boolean
-  setShowEditDialog: (open: boolean) => void
-  showAddCommentDialog: boolean
-  setShowAddCommentDialog: (open: boolean) => void
-  showEditCommentDialog: boolean
-  setShowEditCommentDialog: (open: boolean) => void
-  showPostDetailDialog: boolean
-  setShowPostDetailDialog: (open: boolean) => void
-  showUserModal: boolean
-  setShowUserModal: (open: boolean) => void
-  // 선택된 항목
-  selectedPostForEdit: PostWithAuthor | null
-  selectedComment: Comment | null
-  currentPostId: number | null
-  // 핸들러
-  onPostCreateSuccess: (post: PostWithAuthor) => void
-  onPostEditSuccess: (updatedPost: PostWithAuthor) => void
-  onDeleteComment: (id: number, postId: number) => void
-  onLikeComment: (id: number, postId: number) => void
-  onAddComment: (postId: number) => void
-  onEditComment: (comment: Comment) => void
-  onCommentCreateSuccess: (comment: Comment, postId: number) => void
-  onCommentEditSuccess: (updatedComment: Comment, postId: number) => void
-  selectedPost: PostWithAuthor | null
-  comments: Record<number, Comment[]>
-  selectedUser: User | null
-}
-
-export const PostManagerDialogs = ({
-  showAddDialog,
-  setShowAddDialog,
-  showEditDialog,
-  setShowEditDialog,
-  showAddCommentDialog,
-  setShowAddCommentDialog,
-  showEditCommentDialog,
-  setShowEditCommentDialog,
-  showPostDetailDialog,
-  setShowPostDetailDialog,
-  showUserModal,
-  setShowUserModal,
-  selectedPostForEdit,
-  selectedComment,
-  currentPostId,
-  onPostCreateSuccess,
-  onPostEditSuccess,
-  onDeleteComment,
-  onLikeComment,
-  onAddComment,
-  onEditComment,
-  onCommentCreateSuccess,
-  onCommentEditSuccess,
-  selectedPost,
-  comments,
-  selectedUser,
-}: PostManagerDialogsProps) => {
+export const PostManagerDialogs = () => {
+  // 모든 다이얼로그 컴포넌트가 Jotai atoms를 직접 사용하므로 props 전달 불필요
   return (
     <>
-      <PostCreateForm
-        open={showAddDialog}
-        onOpenChange={setShowAddDialog}
-        onSuccess={onPostCreateSuccess}
-      />
-
-      <PostEditForm
-        post={selectedPostForEdit}
-        open={showEditDialog}
-        onOpenChange={setShowEditDialog}
-        onSuccess={onPostEditSuccess}
-      />
-
-      <PostDetailDialog
-        post={selectedPost}
-        open={showPostDetailDialog}
-        onOpenChange={setShowPostDetailDialog}
-        comments={selectedPost ? comments[selectedPost.id] || [] : []}
-        onAddComment={() => {
-          if (selectedPost) {
-            onAddComment(selectedPost.id)
-          }
-        }}
-        onLikeComment={(id) => {
-          if (selectedPost) {
-            onLikeComment(id, selectedPost.id)
-          }
-        }}
-        onEditComment={onEditComment}
-        onDeleteComment={(id) => {
-          if (selectedPost) {
-            onDeleteComment(id, selectedPost.id)
-          }
-        }}
-      />
-
-      <CommentCreateForm
-        postId={currentPostId || 0}
-        open={showAddCommentDialog && !!currentPostId}
-        onOpenChange={setShowAddCommentDialog}
-        onSuccess={(comment) => {
-          // TanstackQuery mutation이 자동으로 쿼리 무효화하여 댓글 목록 업데이트
-          // 필요시 추가 처리를 위해 onSuccess 콜백 호출
-          if (selectedPost) {
-            onCommentCreateSuccess(comment, selectedPost.id)
-          }
-        }}
-      />
-
-      <CommentEditForm
-        comment={selectedComment}
-        open={showEditCommentDialog}
-        onOpenChange={setShowEditCommentDialog}
-        onSuccess={(updatedComment) => {
-          // TanstackQuery mutation이 자동으로 쿼리 무효화하여 댓글 목록 업데이트
-          // 필요시 추가 처리를 위해 onSuccess 콜백 호출
-          if (selectedPost) {
-            onCommentEditSuccess(updatedComment, selectedPost.id)
-          }
-        }}
-      />
-
-      <UserViewModal user={selectedUser} open={showUserModal} onOpenChange={setShowUserModal} />
+      <PostCreateForm />
+      <PostEditForm />
+      <PostDetailDialog />
+      <CommentCreateForm />
+      <CommentEditForm />
+      <UserViewModal />
     </>
   )
 }

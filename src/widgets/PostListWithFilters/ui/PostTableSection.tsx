@@ -1,3 +1,4 @@
+import { useSetAtom } from "jotai"
 import { PostWithAuthor } from "../../../entity/post"
 import { PostTableRow } from "../../../entity/post/ui"
 import {
@@ -7,26 +8,21 @@ import {
   TableHeader,
   TableRow,
 } from "../../../shared/ui"
+import { selectedTagAtom } from "../../../app/store"
 
 interface PostTableSectionProps {
   posts: PostWithAuthor[]
   loading: boolean
-  onTagClick: (tag: string) => void
-  onViewDetail: (post: PostWithAuthor) => void
-  onEdit: (post: PostWithAuthor) => void
-  onDelete: (id: number) => void
-  onUserClick: (userId: number) => void
 }
 
-export const PostTableSection = ({
-  posts,
-  loading,
-  onTagClick,
-  onViewDetail,
-  onEdit,
-  onDelete,
-  onUserClick,
-}: PostTableSectionProps) => {
+export const PostTableSection = ({ posts, loading }: PostTableSectionProps) => {
+  const setSelectedTag = useSetAtom(selectedTagAtom)
+
+  // 태그 클릭 핸들러
+  const handleTagClick = (tag: string) => {
+    setSelectedTag(tag)
+  }
+
   if (loading) {
     return <div className="flex justify-center p-4">로딩 중...</div>
   }
@@ -44,15 +40,7 @@ export const PostTableSection = ({
       </TableHeader>
       <TableBody>
         {posts.map((post) => (
-          <PostTableRow
-            key={post.id}
-            post={post}
-            onTagClick={onTagClick}
-            onViewDetail={() => onViewDetail(post)}
-            onEdit={() => onEdit(post)}
-            onDelete={() => onDelete(post.id)}
-            onUserClick={() => onUserClick(post.author?.id || 0)}
-          />
+          <PostTableRow key={post.id} post={post} onTagClick={handleTagClick} />
         ))}
       </TableBody>
     </Table>

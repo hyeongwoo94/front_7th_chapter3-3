@@ -2,17 +2,24 @@ import { useMemo } from "react"
 import { useAtom } from "jotai"
 import { PostWithAuthor } from "../../../entity/post"
 import { usePostListQuery, usePostFilterQuery, usePostSearchQuery } from "../../../features/post"
-import { limitAtom, skipAtom, searchQueryAtom, selectedTagAtom } from "../../../app/store"
+import {
+  limitAtom,
+  skipAtom,
+  searchQueryAtom,
+  selectedTagAtom,
+  localPostsAtom,
+  sortByAtom,
+  sortOrderAtom,
+} from "../../../app/store"
 
-interface UsePostListWithFiltersProps {
-  localPosts?: PostWithAuthor[]
-}
-
-export const usePostListWithFilters = ({ localPosts = [] }: UsePostListWithFiltersProps) => {
+export const usePostListWithFilters = () => {
   const [limit] = useAtom(limitAtom)
   const [skip] = useAtom(skipAtom)
   const [searchQuery] = useAtom(searchQueryAtom)
   const [selectedTag] = useAtom(selectedTagAtom)
+  const [localPosts] = useAtom(localPostsAtom)
+  const [sortBy] = useAtom(sortByAtom)
+  const [sortOrder] = useAtom(sortOrderAtom)
 
   // 검색어가 있으면 검색 쿼리 사용
   const searchQueryResult = usePostSearchQuery({
@@ -63,6 +70,8 @@ export const usePostListWithFilters = ({ localPosts = [] }: UsePostListWithFilte
 
   // 로컬 게시물과 서버 게시물 병합 (검색 시)
   const mergedPosts = useMemo(() => {
+    let result: PostWithAuthor[] = []
+
     if (searchQuery.length > 0 && localPosts.length > 0) {
       const query = searchQuery.toLowerCase().trim()
       const filteredLocalPosts = localPosts.filter((post) => {
@@ -74,10 +83,48 @@ export const usePostListWithFilters = ({ localPosts = [] }: UsePostListWithFilte
       // 서버 결과와 로컬 게시물 병합 (중복 제거)
       const serverPostIds = new Set(posts.map((p) => p.id))
       const uniqueLocalPosts = filteredLocalPosts.filter((p) => !serverPostIds.has(p.id))
-      return [...posts, ...uniqueLocalPosts]
+      result = [...posts, ...uniqueLocalPosts]
+    } else {
+      result = posts
     }
-    return posts
-  }, [posts, localPosts, searchQuery])
+
+    // 정렬 적용
+    if (sortBy && sortBy !== "none") {
+      result = [...result].sort((a, b) => {
+        let aValue: number | string = 0
+        let bValue: number | string = 0
+
+        switch (sortBy) {
+          case "id":
+            aValue = a.id
+            bValue = b.id
+            break
+          case "title":
+            aValue = a.title || ""
+            bValue = b.title || ""
+            break
+          case "reactions":
+            // reactions는 { likes: number, dislikes: number } 형태
+            aValue = a.reactions?.likes || 0
+            bValue = b.reactions?.likes || 0
+            break
+          default:
+            return 0
+        }
+
+        // 비교
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          const comparison = aValue.localeCompare(bValue)
+          return sortOrder === "asc" ? comparison : -comparison
+        } else {
+          const comparison = (aValue as number) - (bValue as number)
+          return sortOrder === "asc" ? comparison : -comparison
+        }
+      })
+    }
+
+    return result
+  }, [posts, localPosts, searchQuery, sortBy, sortOrder])
 
   const mergedTotal = useMemo(() => {
     if (searchQuery.length > 0 && localPosts.length > 0) {

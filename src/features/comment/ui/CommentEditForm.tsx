@@ -1,34 +1,34 @@
 import { useEffect, useState } from "react"
+import { useAtom } from "jotai"
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Textarea } from "../../../shared/ui"
 import { Comment } from "../../../entity/comment"
 import { useUpdateCommentMutation } from "../model/useCommentMutations"
+import { showEditCommentDialogAtom, selectedCommentAtom, selectedPostAtom } from "../../../app/store"
+import { usePostManagerHandlers } from "../../../pages/PostsManagerPage/hooks/usePostManagerHandlers"
 
-interface CommentEditFormProps {
-  comment: Comment | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSuccess?: (updatedComment: Comment) => void
-}
-
-export const CommentEditForm = ({ comment, open, onOpenChange, onSuccess }: CommentEditFormProps) => {
+export const CommentEditForm = () => {
+  const [open, setOpen] = useAtom(showEditCommentDialogAtom)
+  const [selectedCommentAtomValue] = useAtom(selectedCommentAtom)
+  const [selectedPost] = useAtom(selectedPostAtom)
   const [selectedComment, setSelectedComment] = useState<Comment | null>(null)
   const updateCommentMutation = useUpdateCommentMutation()
+  const { handleCommentEditSuccess } = usePostManagerHandlers()
 
-  // comment가 변경되면 selectedComment 업데이트
+  // selectedCommentAtomValue가 변경되면 selectedComment 업데이트
   useEffect(() => {
-    if (comment) {
-      setSelectedComment(comment)
+    if (selectedCommentAtomValue) {
+      setSelectedComment(selectedCommentAtomValue)
     } else {
       setSelectedComment(null)
     }
-  }, [comment])
+  }, [selectedCommentAtomValue])
 
   // 다이얼로그가 열릴 때마다 comment로 초기화
   useEffect(() => {
-    if (open && comment) {
-      setSelectedComment(comment)
+    if (open && selectedCommentAtomValue) {
+      setSelectedComment(selectedCommentAtomValue)
     }
-  }, [open, comment])
+  }, [open, selectedCommentAtomValue])
 
   const handleSubmit = async () => {
     if (!selectedComment || !selectedComment.body?.trim()) {
@@ -41,8 +41,10 @@ export const CommentEditForm = ({ comment, open, onOpenChange, onSuccess }: Comm
         id: selectedComment.id,
         body: selectedComment.body,
       })
-      onOpenChange(false)
-      onSuccess?.(data)
+      setOpen(false)
+      if (selectedPost) {
+        handleCommentEditSuccess(data, selectedPost.id)
+      }
     } catch (error: unknown) {
       console.error("댓글 업데이트 오류:", error)
       alert("댓글 수정에 실패했습니다. 콘솔을 확인하세요.")
@@ -52,7 +54,7 @@ export const CommentEditForm = ({ comment, open, onOpenChange, onSuccess }: Comm
   if (!open || !selectedComment) return null
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>댓글 수정</DialogTitle>
