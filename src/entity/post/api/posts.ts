@@ -1,14 +1,15 @@
 import { Post, PostWithAuthor, PostsResponse, CreatePostRequest } from "../model/types"
 import { User } from "../../user/model/types"
+import { API_BASE_URL } from "../../../shared/lib/api"
 
 export const fetchPosts = async (limit: number, skip: number): Promise<{ posts: PostWithAuthor[]; total: number }> => {
-  const postsResponse = await fetch(`/api/posts?limit=${limit}&skip=${skip}`)
+  const postsResponse = await fetch(`${API_BASE_URL}/posts?limit=${limit}&skip=${skip}`)
   if (!postsResponse.ok) {
     throw new Error(`Failed to fetch posts: ${postsResponse.status}`)
   }
   const postsData: PostsResponse = await postsResponse.json()
 
-  const usersResponse = await fetch("/api/users?limit=0&select=username,image")
+  const usersResponse = await fetch(`${API_BASE_URL}/users?limit=0&select=username,image`)
   if (!usersResponse.ok) {
     throw new Error(`Failed to fetch users: ${usersResponse.status}`)
   }
@@ -26,7 +27,7 @@ export const fetchPosts = async (limit: number, skip: number): Promise<{ posts: 
 }
 
 export const searchPosts = async (query: string): Promise<{ posts: Post[]; total: number }> => {
-  const response = await fetch(`/api/posts/search?q=${query}`)
+  const response = await fetch(`${API_BASE_URL}/posts/search?q=${query}`)
   if (!response.ok) {
     throw new Error(`Failed to search posts: ${response.status}`)
   }
@@ -39,8 +40,8 @@ export const searchPosts = async (query: string): Promise<{ posts: Post[]; total
 
 export const fetchPostsByTag = async (tag: string): Promise<{ posts: PostWithAuthor[]; total: number }> => {
   const [postsResponse, usersResponse] = await Promise.all([
-    fetch(`/api/posts/tag/${tag}`),
-    fetch("/api/users?limit=0&select=username,image"),
+    fetch(`${API_BASE_URL}/posts/tag/${tag}`),
+    fetch(`${API_BASE_URL}/users?limit=0&select=username,image`),
   ])
 
   if (!postsResponse.ok) {
@@ -65,7 +66,7 @@ export const fetchPostsByTag = async (tag: string): Promise<{ posts: PostWithAut
 }
 
 export const addPost = async (post: CreatePostRequest): Promise<Post> => {
-  const response = await fetch("/api/posts/add", {
+  const response = await fetch(`${API_BASE_URL}/posts/add`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(post),
@@ -77,7 +78,7 @@ export const addPost = async (post: CreatePostRequest): Promise<Post> => {
 }
 
 export const updatePost = async (id: number, post: Partial<Post>): Promise<Post> => {
-  const response = await fetch(`/api/posts/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(post),
@@ -89,7 +90,7 @@ export const updatePost = async (id: number, post: Partial<Post>): Promise<Post>
 }
 
 export const deletePost = async (id: number): Promise<void> => {
-  const response = await fetch(`/api/posts/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
     method: "DELETE",
   })
   if (!response.ok) {
