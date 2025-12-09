@@ -1,10 +1,4 @@
-// Hooks
-export { usePostList } from "./model/usePostList"
-export { usePostCreate } from "./model/usePostCreate"
-export { usePostEdit } from "./model/usePostEdit"
-export { usePostDelete } from "./model/usePostDelete"
-export { usePostSearch } from "./model/usePostSearch"
-export { usePostFilter } from "./model/usePostFilter"
+// Hooks (TanstackQuery 사용)
 export { usePostDetail } from "./model/usePostDetail"
 
 // UI Components

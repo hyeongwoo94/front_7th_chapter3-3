@@ -1,8 +1,7 @@
-import { PostWithAuthor } from "../../../entity/post"
 import { PostSearchInput, PostFilter } from "../../../features/post"
 
 interface PostControlsProps {
-  onSearch: (posts: PostWithAuthor[], total: number) => void
+  onSearch?: () => void
 }
 
 export const PostControls = ({ onSearch }: PostControlsProps) => {

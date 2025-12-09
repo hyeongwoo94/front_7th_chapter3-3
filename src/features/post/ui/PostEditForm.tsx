@@ -1,6 +1,7 @@
+import { useState, useEffect } from "react"
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea } from "../../../shared/ui"
 import { PostWithAuthor } from "../../../entity/post"
-import { usePostEdit } from "../model/usePostEdit"
+import { useUpdatePostMutation } from "../model/usePostMutations"
 
 interface PostEditFormProps {
   post: PostWithAuthor | null
@@ -10,19 +11,31 @@ interface PostEditFormProps {
 }
 
 export const PostEditForm = ({ post, open, onOpenChange, onSuccess }: PostEditFormProps) => {
-  const { selectedPost, setSelectedPost, handleUpdatePost, loading } = usePostEdit()
+  const [selectedPost, setSelectedPost] = useState<PostWithAuthor | null>(null)
+  const updatePostMutation = useUpdatePostMutation()
 
   // post가 변경되면 selectedPost 업데이트
-  if (post && selectedPost?.id !== post.id) {
-    setSelectedPost(post)
-  }
+  useEffect(() => {
+    if (post) {
+      setSelectedPost(post)
+    }
+  }, [post])
 
   const handleSubmit = async () => {
+    if (!selectedPost) return
+
     try {
-      await handleUpdatePost((updatedPost) => {
-        onOpenChange(false)
-        onSuccess?.(updatedPost)
+      const updatedPost = await updatePostMutation.mutateAsync({
+        id: selectedPost.id,
+        post: selectedPost,
       })
+      onOpenChange(false)
+      // Post를 PostWithAuthor로 변환 (author 정보는 기존 것 유지)
+      const updatedPostWithAuthor: PostWithAuthor = {
+        ...updatedPost,
+        author: selectedPost.author,
+      }
+      onSuccess?.(updatedPostWithAuthor)
     } catch (error) {
       console.error("게시물 수정 실패:", error)
       alert("게시물 수정에 실패했습니다.")
@@ -49,8 +62,8 @@ export const PostEditForm = ({ post, open, onOpenChange, onSuccess }: PostEditFo
             value={selectedPost.body || ""}
             onChange={(e) => setSelectedPost({ ...selectedPost, body: e.target.value })}
           />
-          <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? "수정 중..." : "게시물 업데이트"}
+          <Button onClick={handleSubmit} disabled={updatePostMutation.isPending}>
+            {updatePostMutation.isPending ? "수정 중..." : "게시물 업데이트"}
           </Button>
         </div>
       </DialogContent>

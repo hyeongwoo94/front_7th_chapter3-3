@@ -1,10 +1,10 @@
 import { useAtom } from "jotai"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../shared/ui"
-import { usePostFilter } from "../model/usePostFilter"
+import { useTagsQuery } from "../model/useTagsQuery"
 import { selectedTagAtom, sortByAtom, sortOrderAtom } from "../../../app/store"
 
 export const PostFilter = () => {
-  const { tags } = usePostFilter()
+  const { data: tags = [] } = useTagsQuery()
   const [selectedTag, setSelectedTag] = useAtom(selectedTagAtom)
   const [sortBy, setSortBy] = useAtom(sortByAtom)
   const [sortOrder, setSortOrder] = useAtom(sortOrderAtom)

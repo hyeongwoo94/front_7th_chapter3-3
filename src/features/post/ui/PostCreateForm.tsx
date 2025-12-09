@@ -1,6 +1,8 @@
+import { useState } from "react"
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea } from "../../../shared/ui"
-import { usePostCreate } from "../model/usePostCreate"
+import { useCreatePostMutation } from "../model/usePostMutations"
 import { PostWithAuthor } from "../../../entity/post"
+import { CreatePostRequest } from "../../../entity/post"
 
 interface PostCreateFormProps {
   open: boolean
@@ -9,13 +11,20 @@ interface PostCreateFormProps {
 }
 
 export const PostCreateForm = ({ open, onOpenChange, onSuccess }: PostCreateFormProps) => {
-  const { newPost, setNewPost, handleAddPost, loading } = usePostCreate()
+  const [newPost, setNewPost] = useState<CreatePostRequest>({ title: "", body: "", userId: 1 })
+  const createPostMutation = useCreatePostMutation()
 
   const handleSubmit = async () => {
-    await handleAddPost((post: PostWithAuthor) => {
+    try {
+      const createdPost = await createPostMutation.mutateAsync(newPost)
+      setNewPost({ title: "", body: "", userId: 1 })
       onOpenChange(false)
-      onSuccess?.(post)
-    })
+      // Post를 PostWithAuthor로 변환 (author 정보는 나중에 가져올 수 있음)
+      onSuccess?.(createdPost as PostWithAuthor)
+    } catch (error) {
+      console.error("게시물 생성 실패:", error)
+      alert("게시물 생성에 실패했습니다.")
+    }
   }
 
   return (
@@ -42,8 +51,8 @@ export const PostCreateForm = ({ open, onOpenChange, onSuccess }: PostCreateForm
             value={newPost.userId}
             onChange={(e) => setNewPost({ ...newPost, userId: Number(e.target.value) })}
           />
-          <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? "추가 중..." : "게시물 추가"}
+          <Button onClick={handleSubmit} disabled={createPostMutation.isPending}>
+            {createPostMutation.isPending ? "추가 중..." : "게시물 추가"}
           </Button>
         </div>
       </DialogContent>

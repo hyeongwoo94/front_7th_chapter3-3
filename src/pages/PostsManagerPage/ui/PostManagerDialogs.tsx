@@ -108,6 +108,8 @@ export const PostManagerDialogs = ({
         open={showAddCommentDialog && !!currentPostId}
         onOpenChange={setShowAddCommentDialog}
         onSuccess={(comment) => {
+          // TanstackQuery mutation이 자동으로 쿼리 무효화하여 댓글 목록 업데이트
+          // 필요시 추가 처리를 위해 onSuccess 콜백 호출
           if (selectedPost) {
             onCommentCreateSuccess(comment, selectedPost.id)
           }
@@ -119,6 +121,8 @@ export const PostManagerDialogs = ({
         open={showEditCommentDialog}
         onOpenChange={setShowEditCommentDialog}
         onSuccess={(updatedComment) => {
+          // TanstackQuery mutation이 자동으로 쿼리 무효화하여 댓글 목록 업데이트
+          // 필요시 추가 처리를 위해 onSuccess 콜백 호출
           if (selectedPost) {
             onCommentEditSuccess(updatedComment, selectedPost.id)
           }

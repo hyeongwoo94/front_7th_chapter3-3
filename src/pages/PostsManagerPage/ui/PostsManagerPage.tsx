@@ -13,10 +13,7 @@ const PostsManager = () => {
 
   // 이벤트 핸들러 및 상태 관리
   const {
-    refreshTrigger,
     localPosts,
-    updatedPost,
-    deletedPostId,
     selectedPost,
     comments,
     selectedUser,
@@ -70,10 +67,7 @@ const PostsManager = () => {
           onEdit={openEditDialog}
           onDelete={handleDelete}
           onUserClick={handleUserClick}
-          refreshTrigger={refreshTrigger}
           localPosts={localPosts}
-          updatedPost={updatedPost}
-          deletedPostId={deletedPostId}
         />
       </CardContent>
 

@@ -1,75 +1,46 @@
-import { useState, useCallback, useRef, useEffect } from "react"
+import { useState, useCallback } from "react"
 import { PostWithAuthor } from "../../../entity/post"
-import { fetchComments, Comment } from "../../../entity/comment"
+import { Comment } from "../../../entity/comment"
+import { useCommentsQuery } from "../../../features/comment/model/useCommentQueries"
 
 export const usePostDetail = () => {
   const [selectedPost, setSelectedPost] = useState<PostWithAuthor | null>(null)
-  const [comments, setComments] = useState<Record<number, Comment[]>>({})
-  const [loading, setLoading] = useState(false)
-  const commentsRef = useRef<Record<number, Comment[]>>({})
+  const [commentsMap, setCommentsMap] = useState<Record<number, Comment[]>>({})
 
-  // comments 상태가 변경될 때마다 ref 업데이트
-  useEffect(() => {
-    commentsRef.current = comments
-  }, [comments])
+  // 현재 선택된 게시물의 댓글 쿼리
+  const commentsQuery = useCommentsQuery({
+    postId: selectedPost?.id || 0,
+    enabled: !!selectedPost,
+  })
+
+  // comments를 Record 형태로 변환 (기존 인터페이스 유지)
+  const comments: Record<number, Comment[]> = selectedPost
+    ? { [selectedPost.id]: commentsQuery.data || [] }
+    : commentsMap
 
   const loadComments = useCallback(async (postId: number, force = false) => {
-    // force가 false이고 이미 불러온 댓글이 있으면 다시 불러오지 않음
-    if (!force && commentsRef.current[postId]) {
-      console.log("댓글 이미 로드됨, 건너뜀:", postId)
-      return
-    }
-
-    setLoading(true)
-    try {
-      console.log("댓글 불러오기 시도:", postId, "force:", force)
-      const fetchedComments = await fetchComments(postId)
-      console.log("댓글 불러오기 성공:", fetchedComments.length, "개")
-      setComments((prev) => {
-        const updated = { ...prev, [postId]: fetchedComments }
-        console.log("댓글 상태 업데이트 완료, postId:", postId, "댓글 수:", fetchedComments.length)
-        return updated
-      })
-    } catch (error: unknown) {
-      console.error("댓글 가져오기 오류:", error)
-    } finally {
-      setLoading(false)
-    }
+    // TanstackQuery가 자동으로 처리하므로 빈 함수
+    // 필요시 refetch를 호출할 수 있음
   }, [])
 
-  const openPostDetail = useCallback(
-    async (post: PostWithAuthor) => {
-      setSelectedPost(post)
-      await loadComments(post.id)
-    },
-    [loadComments],
-  )
-
-  // 댓글 추가 (로컬 상태만 업데이트)
-  const addCommentToPost = useCallback((postId: number, comment: Comment) => {
-    setComments((prev) => {
-      const existingComments = prev[postId] || []
-      return { ...prev, [postId]: [...existingComments, comment] }
-    })
+  const openPostDetail = useCallback(async (post: PostWithAuthor) => {
+    setSelectedPost(post)
+    // TanstackQuery가 자동으로 댓글을 불러옴
   }, [])
 
-  // 댓글 수정 (로컬 상태만 업데이트)
-  const updateCommentInPost = useCallback((postId: number, updatedComment: Comment) => {
-    setComments((prev) => {
-      const existingComments = prev[postId] || []
-      return {
-        ...prev,
-        [postId]: existingComments.map((c) => (c.id === updatedComment.id ? updatedComment : c)),
-      }
-    })
+  // 댓글 추가 (TanstackQuery mutation에서 처리)
+  const addCommentToPost = useCallback(() => {
+    // TanstackQuery mutation의 onSuccess에서 자동 처리됨
   }, [])
 
-  // 댓글 삭제 (로컬 상태만 업데이트)
-  const removeCommentFromPost = useCallback((postId: number, commentId: number) => {
-    setComments((prev) => {
-      const existingComments = prev[postId] || []
-      return { ...prev, [postId]: existingComments.filter((c) => c.id !== commentId) }
-    })
+  // 댓글 수정 (TanstackQuery mutation에서 처리)
+  const updateCommentInPost = useCallback(() => {
+    // TanstackQuery mutation의 onSuccess에서 자동 처리됨
+  }, [])
+
+  // 댓글 삭제 (TanstackQuery mutation에서 처리)
+  const removeCommentFromPost = useCallback(() => {
+    // TanstackQuery mutation의 onSuccess에서 자동 처리됨
   }, [])
 
   return {
@@ -78,7 +49,7 @@ export const usePostDetail = () => {
     comments,
     openPostDetail,
     loadComments,
-    loading,
+    loading: commentsQuery.isLoading || commentsQuery.isFetching,
     addCommentToPost,
     updateCommentInPost,
     removeCommentFromPost,
