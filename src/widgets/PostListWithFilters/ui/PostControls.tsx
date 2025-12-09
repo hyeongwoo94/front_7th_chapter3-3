@@ -1,13 +1,9 @@
 import { PostSearchInput, PostFilter } from "../../../features/post"
 
-interface PostControlsProps {
-  onSearch?: () => void
-}
-
-export const PostControls = ({ onSearch }: PostControlsProps) => {
+export const PostControls = () => {
   return (
     <div className="flex gap-4">
-      <PostSearchInput onSearch={onSearch} />
+      <PostSearchInput />
       <PostFilter />
     </div>
   )
