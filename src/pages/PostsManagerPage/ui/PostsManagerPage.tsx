@@ -1,6 +1,6 @@
 import { PostListWithFilters } from "../../../widgets/PostListWithFilters"
 import { useURLSync } from "../hooks/useURLSync"
-import { useDialogManager } from "../hooks/useDialogManager"
+import { useDialogManager } from "../../../features/post"
 import { PostManagerHeader } from "./PostManagerHeader"
 import { PostManagerDialogs } from "./PostManagerDialogs"
 import { Layout, LayoutContent } from "./Layout"

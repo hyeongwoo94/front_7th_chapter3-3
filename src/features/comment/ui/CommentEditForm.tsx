@@ -4,7 +4,7 @@ import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Textarea } fr
 import { Comment } from "../../../entity/comment"
 import { useUpdateCommentMutation } from "../model/useCommentMutations"
 import { showEditCommentDialogAtom, selectedCommentAtom, selectedPostAtom } from "../../../app/store"
-import { usePostManagerHandlers } from "../../../pages/PostsManagerPage/hooks/usePostManagerHandlers"
+import { usePostManagerHandlers } from "../../post/model/usePostManagerHandlers"
 
 export const CommentEditForm = () => {
   const [open, setOpen] = useAtom(showEditCommentDialogAtom)

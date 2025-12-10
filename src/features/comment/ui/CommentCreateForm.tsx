@@ -4,7 +4,7 @@ import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Textarea } fr
 import { CreateCommentRequest } from "../../../entity/comment"
 import { useCreateCommentMutation } from "../model/useCommentMutations"
 import { showAddCommentDialogAtom, currentPostIdAtom, selectedPostAtom } from "../../../app/store"
-import { usePostManagerHandlers } from "../../../pages/PostsManagerPage/hooks/usePostManagerHandlers"
+import { usePostManagerHandlers } from "../../post/model/usePostManagerHandlers"
 
 export const CommentCreateForm = () => {
   const [open, setOpen] = useAtom(showAddCommentDialogAtom)

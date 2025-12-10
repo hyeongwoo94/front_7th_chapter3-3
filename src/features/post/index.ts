@@ -16,3 +16,7 @@ export { usePostSearchQuery } from "./model/usePostSearchQuery"
 export { usePostFilterQuery } from "./model/usePostFilterQuery"
 export { useTagsQuery } from "./model/useTagsQuery"
 export { useCreatePostMutation, useUpdatePostMutation, useDeletePostMutation } from "./model/usePostMutations"
+
+// Business logic hooks
+export { usePostManagerHandlers } from "./model/usePostManagerHandlers"
+export { useDialogManager } from "./model/useDialogManager"

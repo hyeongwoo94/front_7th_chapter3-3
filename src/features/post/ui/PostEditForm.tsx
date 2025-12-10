@@ -4,7 +4,7 @@ import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textar
 import { PostWithAuthor } from "../../../entity/post"
 import { useUpdatePostMutation } from "../model/usePostMutations"
 import { showEditDialogAtom, selectedPostForEditAtom } from "../../../app/store"
-import { usePostManagerHandlers } from "../../../pages/PostsManagerPage/hooks/usePostManagerHandlers"
+import { usePostManagerHandlers } from "../model/usePostManagerHandlers"
 
 export const PostEditForm = () => {
   const [open, setOpen] = useAtom(showEditDialogAtom)

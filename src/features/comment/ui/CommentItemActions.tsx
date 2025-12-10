@@ -7,7 +7,7 @@ import {
   selectedCommentAtom,
   showEditCommentDialogAtom,
 } from "../../../app/store"
-import { usePostManagerHandlers } from "../../../pages/PostsManagerPage/hooks/usePostManagerHandlers"
+import { usePostManagerHandlers } from "../../post/model/usePostManagerHandlers"
 import { useLikeCommentMutation } from "../model/useCommentMutations"
 
 interface CommentItemActionsProps {

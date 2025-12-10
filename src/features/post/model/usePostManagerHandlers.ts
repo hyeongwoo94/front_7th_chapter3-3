@@ -1,7 +1,7 @@
 import { useSetAtom, useAtom } from "jotai"
 import { PostWithAuthor } from "../../../entity/post"
-import { useDeletePostMutation } from "../../../features/post"
-import { useDeleteCommentMutation } from "../../../features/comment"
+import { useDeletePostMutation } from "./usePostMutations"
+import { useDeleteCommentMutation } from "../../comment/model/useCommentMutations"
 import { Comment } from "../../../entity/comment"
 import { fetchUser } from "../../../entity/user"
 import {
@@ -12,7 +12,7 @@ import {
 } from "../../../app/store"
 
 /**
- * PostsManagerPage에서 사용하는 이벤트 핸들러들을 관리하는 훅
+ * 게시물 및 댓글 관련 이벤트 핸들러들을 관리하는 훅
  */
 export const usePostManagerHandlers = () => {
   const [localPosts, setLocalPosts] = useAtom(localPostsAtom)

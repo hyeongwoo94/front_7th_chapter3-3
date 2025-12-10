@@ -14,7 +14,7 @@ import { PostWithAuthor } from "../../../entity/post"
 import { Comment } from "../../../entity/comment"
 
 /**
- * PostsManagerPage의 모든 다이얼로그 상태를 관리하는 훅
+ * 게시물 및 댓글 관련 다이얼로그 상태를 관리하는 훅
  */
 export const useDialogManager = () => {
   // 다이얼로그 표시 상태

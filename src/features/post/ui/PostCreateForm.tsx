@@ -4,7 +4,7 @@ import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textar
 import { useCreatePostMutation } from "../model/usePostMutations"
 import { CreatePostRequest, PostWithAuthor } from "../../../entity/post"
 import { showAddDialogAtom } from "../../../app/store"
-import { usePostManagerHandlers } from "../../../pages/PostsManagerPage/hooks/usePostManagerHandlers"
+import { usePostManagerHandlers } from "../model/usePostManagerHandlers"
 
 export const PostCreateForm = () => {
   const [open, setOpen] = useAtom(showAddDialogAtom)

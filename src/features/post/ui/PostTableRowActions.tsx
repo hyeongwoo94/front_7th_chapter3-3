@@ -7,8 +7,8 @@ import {
   showUserModalAtom,
   selectedUserAtom,
 } from "../../../app/store"
-import { usePostManagerHandlers } from "../../../pages/PostsManagerPage/hooks/usePostManagerHandlers"
-import { useDialogManager } from "../../../pages/PostsManagerPage/hooks/useDialogManager"
+import { usePostManagerHandlers } from "../model/usePostManagerHandlers"
+import { useDialogManager } from "../model/useDialogManager"
 import { fetchUser } from "../../../entity/user"
 import { PostButtons } from "../../../entity/post/ui/PostButtons"
 
