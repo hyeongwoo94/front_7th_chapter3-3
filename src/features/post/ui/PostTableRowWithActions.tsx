@@ -7,14 +7,19 @@ import { fetchUser } from "../../../entity/user"
 
 interface PostTableRowWithActionsProps {
   post: PostWithAuthor
-  onTagClick: (tag: string) => void
 }
 
-export const PostTableRowWithActions = ({ post, onTagClick }: PostTableRowWithActionsProps) => {
+export const PostTableRowWithActions = ({ post }: PostTableRowWithActionsProps) => {
   const searchQuery = useAtomValue(searchQueryAtom)
   const selectedTag = useAtomValue(selectedTagAtom)
+  const setSelectedTag = useSetAtom(selectedTagAtom)
   const setSelectedUser = useSetAtom(selectedUserAtom)
   const setShowUserModal = useSetAtom(showUserModalAtom)
+
+  // 태그 클릭 핸들러 (비즈니스 로직)
+  const handleTagClick = (tag: string) => {
+    setSelectedTag(tag)
+  }
 
   // 사용자 클릭 핸들러
   const handleUserClick = async () => {
@@ -34,7 +39,7 @@ export const PostTableRowWithActions = ({ post, onTagClick }: PostTableRowWithAc
       post={post}
       searchQuery={searchQuery}
       selectedTag={selectedTag}
-      onTagClick={onTagClick}
+      onTagClick={handleTagClick}
       onUserClick={handleUserClick}
       renderActions={(post) => <PostTableRowActions post={post} />}
     />

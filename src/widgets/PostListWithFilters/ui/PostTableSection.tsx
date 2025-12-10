@@ -1,4 +1,3 @@
-import { useSetAtom } from "jotai"
 import { PostWithAuthor } from "../../../entity/post"
 import { PostTableRowWithActions } from "../../../features/post/ui/PostTableRowWithActions"
 import {
@@ -8,7 +7,6 @@ import {
   TableHeader,
   TableRow,
 } from "../../../shared/ui"
-import { selectedTagAtom } from "../../../app/store"
 
 interface PostTableSectionProps {
   posts: PostWithAuthor[]
@@ -16,13 +14,6 @@ interface PostTableSectionProps {
 }
 
 export const PostTableSection = ({ posts, loading }: PostTableSectionProps) => {
-  const setSelectedTag = useSetAtom(selectedTagAtom)
-
-  // 태그 클릭 핸들러
-  const handleTagClick = (tag: string) => {
-    setSelectedTag(tag)
-  }
-
   if (loading) {
     return <div className="flex justify-center p-4">로딩 중...</div>
   }
@@ -40,7 +31,7 @@ export const PostTableSection = ({ posts, loading }: PostTableSectionProps) => {
       </TableHeader>
       <TableBody>
         {posts.map((post) => (
-          <PostTableRowWithActions key={post.id} post={post} onTagClick={handleTagClick} />
+          <PostTableRowWithActions key={post.id} post={post} />
         ))}
       </TableBody>
     </Table>
