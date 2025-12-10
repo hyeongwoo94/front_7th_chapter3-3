@@ -1,5 +1,6 @@
 import { Plus } from "lucide-react"
-import { Button, CardHeader, CardTitle } from "../../../shared/ui"
+import { Button } from "../../../shared/ui"
+import { LayoutHeader, LayoutTitle } from "./Layout"
 
 interface PostManagerHeaderProps {
   onAddClick: () => void
@@ -7,15 +8,15 @@ interface PostManagerHeaderProps {
 
 export const PostManagerHeader = ({ onAddClick }: PostManagerHeaderProps) => {
   return (
-    <CardHeader>
-      <CardTitle className="flex items-center justify-between">
+    <LayoutHeader>
+      <LayoutTitle className="flex items-center justify-between">
         <span>게시물 관리자</span>
         <Button onClick={onAddClick}>
           <Plus className="w-4 h-4 mr-2" />
           게시물 추가
         </Button>
-      </CardTitle>
-    </CardHeader>
+      </LayoutTitle>
+    </LayoutHeader>
   )
 }
 

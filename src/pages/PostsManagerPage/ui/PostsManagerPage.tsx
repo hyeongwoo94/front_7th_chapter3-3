@@ -1,9 +1,9 @@
-import { Card, CardContent } from "../../../shared/ui"
 import { PostListWithFilters } from "../../../widgets/PostListWithFilters"
 import { useURLSync } from "../hooks/useURLSync"
 import { useDialogManager } from "../hooks/useDialogManager"
 import { PostManagerHeader } from "./PostManagerHeader"
 import { PostManagerDialogs } from "./PostManagerDialogs"
+import { Layout, LayoutContent } from "./Layout"
 
 const PostsManager = () => {
   // URL 동기화
@@ -13,14 +13,14 @@ const PostsManager = () => {
   const { openAddDialog } = useDialogManager()
 
   return (
-    <Card className="w-full max-w-6xl mx-auto">
+    <Layout className="w-full max-w-6xl mx-auto">
       <PostManagerHeader onAddClick={openAddDialog} />
-      <CardContent>
+      <LayoutContent>
         <PostListWithFilters />
-      </CardContent>
+      </LayoutContent>
 
       <PostManagerDialogs />
-    </Card>
+    </Layout>
   )
 }
 

@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue } from "jotai"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../shared/ui"
 import { highlightText } from "../../../shared/lib/utils"
-import { CommentList } from "../../../entity/comment/ui"
+import { CommentListWithActions } from "../../../features/comment/ui/CommentListWithActions"
 import {
   searchQueryAtom,
   showPostDetailDialogAtom,
@@ -23,7 +23,7 @@ export const PostDetailDialog = () => {
         </DialogHeader>
         <div className="space-y-4">
           <p>{highlightText(selectedPost.body || "", searchQuery)}</p>
-          <CommentList />
+          <CommentListWithActions />
         </div>
       </DialogContent>
     </Dialog>
