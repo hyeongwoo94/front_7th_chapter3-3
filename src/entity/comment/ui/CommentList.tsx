@@ -1,4 +1,6 @@
 import { Comment } from "../model/types"
+import { Button } from "../../../shared/ui"
+import { Plus } from "lucide-react"
 
 interface CommentListProps {
   comments: Comment[]
@@ -13,9 +15,10 @@ export const CommentList = ({ comments, searchQuery = "", onAddComment, renderCo
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-sm font-semibold">댓글</h3>
         {onAddComment && (
-          <button onClick={onAddComment} className="text-xs">
+          <Button onClick={onAddComment} className="text-xs px-2 py-2">
+            <Plus className="w-4 h-4 mr-2" />
             댓글 추가
-          </button>
+          </Button>
         )}
       </div>
       <div className="space-y-1">

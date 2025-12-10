@@ -1,13 +1,13 @@
 import { Edit2, MessageSquare, Trash2 } from "lucide-react"
 import { Button } from "../../../shared/ui"
 
-interface PostActionsProps {
+interface PostButtonsProps {
   onViewDetail: () => void
   onEdit: () => void
   onDelete: () => void
 }
 
-export const PostActions = ({ onViewDetail, onEdit, onDelete }: PostActionsProps) => {
+export const PostButtons = ({ onViewDetail, onEdit, onDelete }: PostButtonsProps) => {
   return (
     <div className="flex items-center gap-2">
       <Button variant="ghost" size="sm" onClick={onViewDetail}>

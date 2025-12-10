@@ -1,6 +1,6 @@
 import { useSetAtom } from "jotai"
 import { PostWithAuthor } from "../../../entity/post"
-import { PostTableRow } from "../../../entity/post/ui"
+import { PostTableRowWithActions } from "../../../features/post/ui/PostTableRowWithActions"
 import {
   Table,
   TableBody,
@@ -40,7 +40,7 @@ export const PostTableSection = ({ posts, loading }: PostTableSectionProps) => {
       </TableHeader>
       <TableBody>
         {posts.map((post) => (
-          <PostTableRow key={post.id} post={post} onTagClick={handleTagClick} />
+          <PostTableRowWithActions key={post.id} post={post} onTagClick={handleTagClick} />
         ))}
       </TableBody>
     </Table>

@@ -1,6 +1,4 @@
 import { useAtom, useAtomValue } from "jotai"
-import { Plus } from "lucide-react"
-import { Button } from "../../../shared/ui"
 import { CommentList } from "../../../entity/comment/ui"
 import { CommentItemWithActions } from "./CommentItemWithActions"
 import {

@@ -7,6 +7,8 @@ export { PostEditForm } from "./ui/PostEditForm"
 export { PostSearchInput } from "./ui/PostSearchInput"
 export { PostFilter } from "./ui/PostFilter"
 export { PostDetailDialog } from "./ui/PostDetailDialog"
+export { PostTableRowWithActions } from "./ui/PostTableRowWithActions"
+export { PostTableRowActions } from "./ui/PostTableRowActions"
 
 // TanstackQuery hooks
 export { usePostListQuery } from "./model/usePostListQuery"
