@@ -6,16 +6,30 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  ErrorMessage,
 } from "../../../shared/ui"
+import { PostTableSkeleton } from "./PostTableSkeleton"
 
 interface PostTableSectionProps {
   posts: PostWithAuthor[]
   loading: boolean
+  error?: Error | unknown
+  onRetry?: () => void
 }
 
-export const PostTableSection = ({ posts, loading }: PostTableSectionProps) => {
+export const PostTableSection = ({ posts, loading, error, onRetry }: PostTableSectionProps) => {
+  if (error) {
+    return (
+      <ErrorMessage
+        error={error}
+        title="게시물을 불러오는 중 오류가 발생했습니다"
+        onRetry={onRetry}
+      />
+    )
+  }
+
   if (loading) {
-    return <div className="flex justify-center p-4">로딩 중...</div>
+    return <PostTableSkeleton />
   }
 
   return (

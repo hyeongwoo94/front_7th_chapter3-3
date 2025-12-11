@@ -67,6 +67,7 @@ export const usePostListWithFilters = () => {
   }, [activeQuery.data])
 
   const loading = activeQuery.isLoading || activeQuery.isFetching
+  const error = activeQuery.isError ? activeQuery.error : null
 
   // 로컬 게시물과 서버 게시물 병합 (검색 시)
   const mergedPosts = useMemo(() => {
@@ -166,6 +167,7 @@ export const usePostListWithFilters = () => {
     posts: mergedPosts,
     total: mergedTotal,
     loading,
+    error,
     handleSearchPosts,
     handleTagFilter,
     updatePostInList,

@@ -4,10 +4,13 @@ import { useTagsQuery } from "../model/useTagsQuery"
 import { selectedTagAtom, sortByAtom, sortOrderAtom } from "../../../app/store"
 
 export const PostFilter = () => {
-  const { data: tags = [] } = useTagsQuery()
+  const tagsQuery = useTagsQuery()
+  const tags = tagsQuery.data || []
   const [selectedTag, setSelectedTag] = useAtom(selectedTagAtom)
   const [sortBy, setSortBy] = useAtom(sortByAtom)
   const [sortOrder, setSortOrder] = useAtom(sortOrderAtom)
+
+  // 태그 로딩 실패 시에도 기본 기능은 유지 (에러는 조용히 처리)
 
   return (
     <div className="flex gap-4">
