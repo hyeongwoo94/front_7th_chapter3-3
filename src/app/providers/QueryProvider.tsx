@@ -9,23 +9,9 @@ const queryClient = new QueryClient({
       gcTime: 1000 * 60 * 10, // 10분 (이전 cacheTime)
       refetchOnWindowFocus: false,
       retry: 1,
-      onError: (error) => {
-        // 전역 쿼리 에러 핸들링
-        // 개발 환경에서만 콘솔에 출력 (프로덕션에서는 에러 로깅 서비스로 전송)
-        if (import.meta.env.DEV) {
-          console.error("Query Error:", error)
-        }
-      },
     },
     mutations: {
       retry: 1,
-      onError: (error) => {
-        // 전역 mutation 에러 핸들링
-        // 개발 환경에서만 콘솔에 출력 (프로덕션에서는 에러 로깅 서비스로 전송)
-        if (import.meta.env.DEV) {
-          console.error("Mutation Error:", error)
-        }
-      },
     },
   },
 })
